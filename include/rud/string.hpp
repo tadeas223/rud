@@ -14,7 +14,12 @@ namespace rud {
     };
 
     struct AllocString : String {
+        //  debug_mode:
+        //      cstr != null
+        //  
+        //  not checked: cstr must be null terminated
         static AllocString make_copy_cstr(const ascii* cstr);
+        
         static AllocString make_copy(const ascii* chars, u32 len);
         
         static AllocString make_take(const ascii* chars, u32 len);
@@ -34,7 +39,6 @@ namespace rud {
         }
         static StringLit make(const ascii* buffer, const u32 len);
         static StringLit make_cstr(const ascii* cstr);
-
     };
 
     u32 cstr_len(const ascii* cstr);

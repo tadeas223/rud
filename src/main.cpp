@@ -1,29 +1,27 @@
+#include "rud/compile_settings.hpp"
 #include "rud/memory.hpp"
+#include "rud/option.hpp"
 #include "rud/os/io.hpp"
+#include "rud/system.hpp"
 
 using namespace rud;
 using namespace rud::os;
 
-template <typename Writeable>
-Result<void, IOError> write_hello(Writer<Writeable>& writer) {
-    Result<u64, IOError> r_write = writer.write(Lit("hello\n"));
-    if(!r_write.ok) {
-        return Result<void, IOError>::make_error(r_write.error);
-    }
-    return Result<void, IOError>::make_ok();
-}
-
 int main (int argc, char *argv[]) {
-    File file = File::make(Lit("test.txt"),
-        FileAccessMode::Read|FileAccessMode::Write,
-        FileCreateMode::Create
-    ).except(Lit("failed to open or create a file"));
+    Result<File, IOError> r_file = File::make(Lit("test.txt"),
+        FileAccessMode::Read);
+
+    if(r_file.is_error()) {
+        panic(Lit("failed to open file"));
+    }
+    File file = r_file.unwrap();
     
-    StdOut out = StdOut::make();
+    AllocString string = file.read_to_string()
+        .except(Lit("failed to read file"));
 
-    write_hello(out).except(Lit("failed to write to stdout"));
-    write_hello(file).except(Lit("failed to write to a file"));
+    debug_print(string);
 
+    string.destroy();
     file.destroy();
     return 0;
 }

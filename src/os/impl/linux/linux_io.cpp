@@ -114,16 +114,16 @@ namespace rud::os {
     
     Result<AllocString, IOError> File::read_to_string() {
         Result<FileMetadata, IOError> r_meta  = metadata();
-        if(!r_meta.ok) {
-            return Result<AllocString, IOError>::make_error(r_meta.error);
+        if(!r_meta.is_ok()) {
+            return Result<AllocString, IOError>::make_error(r_meta.unwrap_error());
         }
-        FileMetadata meta = r_meta.value;
+        FileMetadata meta = r_meta.unwrap();
         
         ascii* buffer = static_cast<ascii*>(allocate(meta.size));
         
         Result<u64, IOError> r_read = read(buffer, meta.size);
-        if(!r_read.ok){
-            return Result<AllocString, IOError>::make_error(r_read.error);
+        if(!r_read.is_ok()){
+            return Result<AllocString, IOError>::make_error(r_read.unwrap_error());
         }
         
         AllocString string = AllocString::make_take(buffer, meta.size);

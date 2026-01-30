@@ -1,4 +1,5 @@
 #include "rud/string.hpp"
+#include "rud/compile_settings.hpp"
 #include "rud/memory.hpp"
 
 namespace rud {
@@ -46,7 +47,7 @@ namespace rud {
         return cstr;
     }
    
-    u32 cstr_len(const ascii* cstr){
+    u32 cstr_len(const ascii* cstr) {
         u32 len = 0;
         while(cstr[len]) {
             len++;

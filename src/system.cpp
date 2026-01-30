@@ -6,7 +6,7 @@
 namespace rud {
     [[noreturn]] void panic(const String& msg) {
         ascii* cstr = msg.to_cstr();
-        printf("%s\n", cstr);
+        printf("program panicked\n%s\n", cstr);
         deallocate(cstr);
 
         abort(); 

@@ -1,4 +1,5 @@
 #include "rud/memory.hpp"
+#include "rud/compile_settings.hpp"
 #include "rud/result.hpp"
 #include "rud/env.hpp"
 #include <cstdlib>
@@ -6,6 +7,8 @@
 
 namespace rud {
     Result<void*, AllocError> try_allocate(u64 size) {
+        Assert(size != 0, Lit("cannot allocate memory of size 0"));
+
         void* ptr = malloc(size);
         if(ptr == nullptr) {
             return Result<void*, AllocError>::make_error(AllocError::OutOfMemory); 
@@ -15,6 +18,8 @@ namespace rud {
     }
     
     void* allocate(u64 size) {
+        Assert(size != 0, Lit("cannot allocate memory of size 0"));
+        
         void* ptr = malloc(size);
         if(ptr == nullptr) {
             #ifdef EXCEPTIONS_ENABLED

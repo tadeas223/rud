@@ -19,7 +19,7 @@ namespace rud {
     inline T* allocate() {
         return static_cast<T*>(allocate(sizeof(T))); 
     }
-
+    
     void deallocate(void* ptr);
 
     void mem_copy(void* dest, const void* src, u64 size);

@@ -25,7 +25,7 @@ namespace rud {
             #ifdef EXCEPTIONS_ENABLED
             throw AllocError::OutOfMemory;
             #else
-            panic(Lit("allocation failed").temp());
+            panic(Lit("allocation failed"));
             #endif
         }
 

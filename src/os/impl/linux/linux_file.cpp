@@ -1,20 +1,16 @@
 #include "rud/memory.hpp"
-#include "rud/os/io.hpp"
-#include "rud/result.hpp"
-#include "rud/string.hpp"
-#include "rud/system.hpp"
-
+#include "rud/os/file.hpp"
 #include <cstdio>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-using namespace rud::os;
 using namespace rud;
-
-constexpr u32 new_file_permissions = 0644;
+using namespace rud::os;
 
 namespace {
+    constexpr u32 new_file_permissions = 0644;
+
     int file_access_mode_to_flags(FileAccessMode mode) {
         int flags = 0;
         if(mode * FileAccessMode::Read && mode * FileAccessMode::Write) {
@@ -131,16 +127,16 @@ namespace rud::os {
         return write(str.chars, str.len);
     }
     
-    Result<void, IOError> File::seek(SeekFrom from, u64 bytes) {
+    Result<void, IOError> File::seek(FileSeekFrom from, u64 bytes) {
         int whence;
         switch(from) {
-            case SeekFrom::Current:
+            case FileSeekFrom::Current:
                 whence = SEEK_CUR;
                 break;
-            case SeekFrom::Start:
+            case FileSeekFrom::Start:
                 whence = SEEK_SET;
                 break;
-            case SeekFrom::End:
+            case FileSeekFrom::End:
                 whence = SEEK_END;
                 break;
         }
@@ -173,39 +169,4 @@ namespace rud::os {
         
         return Result<FileMetadata, IOError>::make_ok(metadata);
     }
-
-    StdOut StdOut::make() {
-        return {};          
-    }
-
-    Result<u64, IOError> StdOut::write(const void* buffer, u64 size) {
-        ssize_t write_result = ::write(1, buffer, size);
-        if(write_result < 0) {
-            return Result<u64, IOError>::make_error(IOError::Other);
-        }
-
-        return Result<u64, IOError>::make_ok(write_result);
-    }
-
-    Result<u64, IOError> StdOut::write(const String str) {
-        return write(str.chars, str.len); 
-    }
-
-    StdErr StdErr::make() {
-        return {};          
-    }
-
-    Result<u64, IOError> StdErr::write(const void* buffer, u64 size) {
-        ssize_t write_result = ::write(2, buffer, size);
-        if(write_result < 0) {
-            return Result<u64, IOError>::make_error(IOError::Other);
-        }
-
-        return Result<u64, IOError>::make_ok(write_result);
-    }
-
-    Result<u64, IOError> StdErr::write(const String str) {
-        return write(str.chars, str.len); 
-    }
-
 }

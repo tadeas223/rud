@@ -1,3 +1,5 @@
+#include "rud/memory.hpp"
+
 #include "rud/ds/linear_view.hpp"
 #include "rud/os/io.hpp"
 #include "rud/os/system.hpp"
@@ -11,11 +13,9 @@ using namespace rud::ds;
 using namespace rud::os;
 
 int main (int argc, char *argv[]) {
-    Array<String, 1> args = Array<String, 1>::make();
-    args.set(0, Lit("5"));
+    Array<String, 1> array = Array<String, 1>::make();
+    array.set(0, Lit("test.txt"));
 
-    run_process(Lit("sleep"), args.to_linear_view());
-
-    debug_print(Lit("done"));
+    run_process(Lit("cat"), array.to_linear_view());
     return 0;
 }

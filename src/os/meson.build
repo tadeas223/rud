@@ -1,4 +1,6 @@
 sources += files(
-  'io.cpp',
   'system.cpp',
+  'stdout.cpp',
+  'stderr.cpp',
+  'file.cpp',
 )

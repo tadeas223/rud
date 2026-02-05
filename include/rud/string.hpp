@@ -1,9 +1,10 @@
 #ifndef RUD_STRING_HPP
 #define RUD_STRING_HPP
 
+#include "rud/macros.hpp"
 #include "rud/types.hpp"
 
-#define Lit(cstr) StringLit::make(cstr)
+#define Lit(cstr) rud::StringLit::make(cstr)
 
 namespace rud {
     struct String {
@@ -11,10 +12,8 @@ namespace rud {
         u32 len;
 
         ascii* to_cstr() const;
-
-        inline const String* temp() {
-            return this;
-        }
+        
+        TempFuncDecl(String)
     };
     
     struct AllocString : String {

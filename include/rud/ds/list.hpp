@@ -1,6 +1,7 @@
 #ifndef RUD_DS_LIST_HPP
 #define RUD_DS_LIST_HPP
 
+#include "rud/ds/linear_view.hpp"
 #include "rud/ds/node.hpp"
 #include "rud/memory.hpp"
 
@@ -124,17 +125,6 @@ namespace rud::ds {
             return &iter_node->value;
         }
 
-        void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index is outside of the list").temp());
-
-            Node<T>* iter_node = p_head;
-            for(u32 i = 0; i < index; i++) {
-                iter_node = iter_node->next;
-            }
-
-            iter_node->value = value;
-        }
-
         T remove(u32 index) {
             Assert(index < p_len, Lit("index is outside of the list").temp());
 
@@ -186,6 +176,27 @@ namespace rud::ds {
         
         const T* operator[](u32 index) const {
             return get(index);
+        }
+        
+        LinearView<T> to_linear_view() {
+            LinearView<T> view;
+
+            view.ctx = this;
+
+            view.get_func = [](void* ctx, u32 index) {
+                List<T>* self = static_cast<List<T>*>(ctx);
+                return self->get(index);
+            };
+            view.set_func = [] (void* ctx, u32 index) { 
+                List<T>* self = static_cast<List<T>*>(ctx);
+                return self->set(index); 
+            };
+            view.len_func = [] (void* ctx) {
+                List<T>* self = static_cast<List<T>*>(ctx);
+                return self->len(); 
+            };
+
+            return view;
         }
     };
 }

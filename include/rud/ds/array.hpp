@@ -2,7 +2,9 @@
 #define RUD_DS_ARRAY_HPP
 
 #include "rud/compile_settings.hpp"
+#include "rud/ds/linear_view.hpp"
 #include "rud/types.hpp"
+
 namespace rud::ds {
     template<typename T, u32 N>
     struct Array {
@@ -12,11 +14,11 @@ namespace rud::ds {
             return {};
         }
 
-        constexpr u32 len() {
+        u32 len() const {
             return N;
         }
 
-        const T* get(u32 index) {
+        const T* get(u32 index) const {
             Assert(index < N, Lit("index is outside of an array").temp());
 
             return &data[index];
@@ -27,12 +29,6 @@ namespace rud::ds {
 
             return &data[index];
         }
-        
-        void set(u32 index, T value) {
-            Assert(index < N, Lit("index is outside of an array").temp());
-
-            data[index] = value;
-        }
 
         T* operator[](u32 index) {
             return set(index);
@@ -40,6 +36,27 @@ namespace rud::ds {
         
         const T* operator[](u32 index) const {
             return get(index);
+        }
+
+        LinearView<T> to_linear_view() {
+            LinearView<T> view;
+
+            view.ctx = this;
+
+            view.get_func = [](void* ctx, u32 index) {
+                Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
+                return self->get(index);
+            };
+            view.set_func = [] (void* ctx, u32 index) { 
+                Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
+                return self->set(index); 
+            };
+            view.len_func = [] (void* ctx) {
+                Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
+                return self->len(); 
+            };
+
+            return view;
         }
     };
 }

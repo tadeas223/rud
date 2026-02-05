@@ -6,8 +6,8 @@
 #include <cstring>
 
 namespace rud {
-    Result<void*, AllocError> try_allocate(u64 size) {
-        Assert(size != 0, Lit("cannot allocate memory of size 0"));
+    Result<void*, AllocError> try_allocate_size(u64 size) {
+        Assert(size != 0, Lit("cannot allocate memory of size 0").temp());
 
         void* ptr = malloc(size);
         if(ptr == nullptr) {
@@ -17,15 +17,15 @@ namespace rud {
         return Result<void*, AllocError>::make_ok(ptr);
     }
     
-    void* allocate(u64 size) {
-        Assert(size != 0, Lit("cannot allocate memory of size 0"));
+    void* allocate_size(u64 size) {
+        Assert(size != 0, Lit("cannot allocate memory of size 0").temp());
         
         void* ptr = malloc(size);
         if(ptr == nullptr) {
             #ifdef EXCEPTIONS_ENABLED
             throw AllocError::OutOfMemory;
             #else
-            panic(string_lit_make("allocation failed"));
+            panic(Lit("allocation failed").temp());
             #endif
         }
 

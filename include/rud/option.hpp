@@ -3,6 +3,7 @@
 
 #include "rud/compile_settings.hpp"
 #include "rud/string.hpp"
+#include "rud/system.hpp"
 
 namespace rud {
     template<typename V>
@@ -25,37 +26,14 @@ namespace rud {
         inline bool is_none() {
             return !p_is_some; 
         }
-
-        inline V unwrap() {
-            Assert(!p_is_some == true, Lit("Option::unwrap() called but option has no value"));
-
+        
+        inline V or_panic() {
+            if(!p_is_some) panic(Lit("option had no value").temp());
             return p_value;
         }
-    };
-    
-    template <typename V>
-    struct [[nodiscard]] PtrOption {
-        V* p_value;
-        
-        static inline PtrOption<V> make_some(V* value) {
-            return {value}; 
-        }
-        
-        static inline PtrOption<V> make_none() {
-            return {nullptr}; 
-        }
 
-        inline bool is_some() {
-            return (p_value != nullptr); 
-        }
-        
-        inline bool is_none() {
-            return (p_value == nullptr); 
-        }
-
-        inline V* unwrap() {
-            Assert(p_value == nullptr, Lit("Option::unwrap() called but option has no value"));
-
+        inline V unwrap() {
+            Assert(!p_is_some, Lit("Option::unwrap called, but option does not hold a value").temp());
             return p_value;
         }
     };

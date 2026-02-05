@@ -3,11 +3,12 @@
 #include "rud/compile_settings.hpp"
 
 namespace rud {
-    void _assert(bool value, const String& expr, const String& msg) {
+    void _assert(bool value, const String* expr, const String* msg) {
         if(!value) {
-            os::debug_print(Lit("assertion failed\n"));
+            os::debug_print(Lit("assertion failed\n").temp());
             os::debug_print(msg);
-            os::debug_print(Lit("\n"));
+            os::debug_print(Lit("\n").temp());
+            panic(Lit("").temp());
         }
     }
 }

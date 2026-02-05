@@ -29,11 +29,16 @@ namespace rud {
             return p_value;
         }
 
-        inline V except(const String& msg) {
+        inline V except(const String* msg) {
             if(!p_is_ok) panic(msg);
             return p_value;
         }
 
+        inline V or_panic() {
+            if(!p_is_ok) panic(Lit("unhandled error occured").temp());
+            return p_value;
+        }
+ 
         inline bool is_ok() {
             return p_is_ok; 
         }
@@ -43,13 +48,13 @@ namespace rud {
         }
 
         V unwrap() {
-            AlwaysAssert(p_is_ok == true, Lit("Result::value() called, but result contained an error"));
+            Assert(p_is_ok == true, Lit("Result::value() called, but result contained an error").temp());
 
             return p_value;
         }
 
         E unwrap_error() {
-            AlwaysAssert(p_is_ok == false, Lit("Result::error() called, but result contained a value"));
+            Assert(p_is_ok == false, Lit("Result::error() called, but result contained a value").temp());
 
             return p_error;
         }
@@ -69,7 +74,7 @@ namespace rud {
             return {.p_error = error, .p_is_ok = true};
         }
 
-        inline void except(const String& msg) {
+        inline void except(const String* msg) {
             if(!p_is_ok) panic(msg);
         }
         
@@ -86,12 +91,16 @@ namespace rud {
             return !p_is_ok; 
         }
 
+        inline void or_panic() {
+            if(!p_is_ok) panic(Lit("unhandled error occured").temp());
+        }
+
         void unwrap() {
-            AlwaysAssert(p_is_ok == true, Lit("Result::value() called, but result contained an error"));
+            Assert(p_is_ok == true, Lit("Result::value() called, but result contained an error").temp());
         }
 
         E unwrap_error() {
-            AlwaysAssert(p_is_ok == false, Lit("Result::error() called, but result contained a value"));
+            Assert(p_is_ok == false, Lit("Result::error() called, but result contained a value").temp());
 
             return p_error;
         }

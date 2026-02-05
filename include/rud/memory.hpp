@@ -11,13 +11,25 @@ namespace rud {
     
     // may throw AllocError
     // never returns null
-    void* allocate(u64 size);
+    void* allocate_size(u64 size);
     
-    Result<void*, AllocError> try_allocate(u64 size);
+    Result<void*, AllocError> try_allocate_size(u64 size);
+    
+    template<typename T>
+    inline Result<T*, AllocError> try_allocate(T original) {
+        Result<T*, AllocError> r_ptr = static_cast<T*>(try_allocate_size(sizeof(T)));
+        if(r_ptr.is_ok()) {
+            *r_ptr.unwrap() = original;
+        }
+
+        return r_ptr;
+    }
   
     template<typename T>
-    inline T* allocate() {
-        return static_cast<T*>(allocate(sizeof(T))); 
+    inline T* allocate(T original) {
+        T* ptr = static_cast<T*>(allocate_size(sizeof(T)));
+        *ptr = original;
+        return ptr;
     }
     
     void deallocate(void* ptr);

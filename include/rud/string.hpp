@@ -11,8 +11,12 @@ namespace rud {
         u32 len;
 
         ascii* to_cstr() const;
-    };
 
+        inline const String* temp() {
+            return this;
+        }
+    };
+    
     struct AllocString : String {
         //  debug_mode:
         //      cstr != null
@@ -31,12 +35,13 @@ namespace rud {
 
         void destroy() const;
     };
-
+    
     struct StringLit: String {
         template<u32 N>
         static constexpr StringLit make(const ascii (&s)[N]) {
             return {const_cast<ascii*>(s), N-1};
         }
+
         static StringLit make(const ascii* buffer, const u32 len);
         static StringLit make_cstr(const ascii* cstr);
     };

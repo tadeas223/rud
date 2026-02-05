@@ -1,27 +1,22 @@
-#include "rud/compile_settings.hpp"
-#include "rud/memory.hpp"
-#include "rud/option.hpp"
+#include "rud/ds/array.hpp"
+#include "rud/string.hpp"
+#include "rud/ds/list.hpp"
 #include "rud/os/io.hpp"
-#include "rud/system.hpp"
+#include <cstdio>
 
 using namespace rud;
 using namespace rud::os;
+using namespace rud::ds;
 
 int main (int argc, char *argv[]) {
-    Result<File, IOError> r_file = File::make(Lit("test.txt"),
-        FileAccessMode::Read);
+    Array<u32, 5> arr = Array<u32, 5>::make();
+    *arr[0] = 1;
+    *arr[1] = 1;
+    *arr[2] = 2;
 
-    if(r_file.is_error()) {
-        panic(Lit("failed to open file"));
+    for(u32 i = 0; i < arr.len(); i++) {
+        printf("%d\n", *arr[i]); 
     }
-    File file = r_file.unwrap();
-    
-    AllocString string = file.read_to_string()
-        .except(Lit("failed to read file"));
 
-    debug_print(string);
-
-    string.destroy();
-    file.destroy();
     return 0;
 }

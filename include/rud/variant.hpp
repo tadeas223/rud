@@ -9,8 +9,6 @@
 
 namespace rud {
 
-    using u32 = unsigned int;
-
     // ------------------------------------------------------------
     // Recursive union storage
     // ------------------------------------------------------------
@@ -77,8 +75,7 @@ namespace rud {
             } else {
                 panic(Lit("Type mismatch in variant_get"));
             }
-        }
-        return variant_get_impl<T, I + 1>(storage.tail, index);
+        } return variant_get_impl<T, I + 1>(storage.tail, index);
     }
 
     template<typename T, u32 I, typename Last>

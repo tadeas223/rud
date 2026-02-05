@@ -1,11 +1,10 @@
 #include "rud/string.hpp"
-#include "rud/compile_settings.hpp"
 #include "rud/memory.hpp"
 
 namespace rud {
     AllocString AllocString::make_copy_cstr(const ascii* cstr){
         u32 len = cstr_len(cstr);
-        ascii* new_chars = static_cast<ascii*>(allocate(len));
+        ascii* new_chars = static_cast<ascii*>(allocate_size(len));
 
         mem_copy(new_chars, cstr, len);
 
@@ -13,7 +12,7 @@ namespace rud {
     }
 
     AllocString AllocString::make_copy(const ascii* chars, const u32 len) {
-        ascii* new_chars = static_cast<ascii*>(allocate(len));
+        ascii* new_chars = static_cast<ascii*>(allocate_size(len));
 
         mem_copy(new_chars, chars, len);
 
@@ -39,7 +38,7 @@ namespace rud {
     }
 
     ascii* String::to_cstr() const {
-        ascii* cstr = static_cast<ascii*>(allocate(len+1));
+        ascii* cstr = static_cast<ascii*>(allocate_size(len+1));
 
         mem_copy(cstr, chars, len);
         cstr[len] = '\0';

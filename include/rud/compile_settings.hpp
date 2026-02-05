@@ -2,18 +2,17 @@
 #define RUD_COMPILE_SETTINGS_HPP
 
 #include "rud/string.hpp"
-#include "rud/system.hpp"
 
 #define Assert(expr, msg)\
 do {\
     if constexpr (COMPILE_MODE == safe_mode) {\
-        _assert(expr, Lit(#expr), msg);\
+        _assert(expr, String({const_cast<ascii*>(#expr), sizeof(#expr) - 1}).temp(), msg);\
     }\
 } while(0)
 
 #define AlwaysAssert(expr, msg)\
 do {\
-    _assert(expr, Lit(#expr), msg);\
+    _assert(expr, String({const_cast<ascii*>(#expr, sizeof(#expr) - 1}).temp(), msg);\
 } while(0)
 
 namespace rud {
@@ -24,7 +23,7 @@ namespace rud {
     #define COMPILE_MODE safe_mode
     #endif
 
-    void _assert(bool value, const String& expr, const String& msg);
+    void _assert(bool value, const String* expr, const String* msg);
 }
 
 #endif

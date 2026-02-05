@@ -11,7 +11,7 @@ namespace rud {
     using s16 = signed short;
     using s32 = signed int;
     using s64 = signed long;
-
+    
     using ascii = char;
 }
 

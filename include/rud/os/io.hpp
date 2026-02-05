@@ -7,6 +7,7 @@
 
 namespace rud::os {
     using FileHandle = void*;
+    using DirectoryHandle = void*;
 
     enum class IOError {
         NotFound,
@@ -58,47 +59,27 @@ namespace rud::os {
     inline bool operator*(FileCreateMode a, FileCreateMode b) {
         return (static_cast<u32>(a) * static_cast<u32>(b)) != 0; 
     }
-    
-    template<typename Derived>
-    struct Writer {
-        Result<u64, IOError> write(const void* buffer, u64 size)
-        {
-            return static_cast<Derived*>(this)->write(buffer, size);
-        }
-        
-        Result<u64, IOError> write(const String* str) {
-            return static_cast<Derived*>(this)->write(str);
-        }
-    };
-    
-    template<typename Derived>
-    struct Reader {
-        Result<u64, IOError> read(const void* buffer, u64 size)
-        {
-            return static_cast<Derived*>(this)->read(buffer, size);
-        }
-        
-        Result<AllocString, IOError> read_all_to_string() {
-            return static_cast<Derived*>(this)->read_all_to_string();
-        }
-        
-        Result<AllocString, IOError> read_line() {
-            return static_cast<Derived*>(this)->read_line();
-        }
-    };
-    
-    struct File: public Writer<File> {
+
+//    struct Directory {
+//        DirectoryHandle handle;
+//
+//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode);
+//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode, DirectoryCreateMode create_mode);
+//        Result<String, IOError> ls();
+//    };
+
+    struct File {
         FileHandle handle;
 
-        static Result<File, IOError> make(const String* path, FileAccessMode access_mode);
-        static Result<File, IOError> make(const String* path, FileAccessMode access_mode, FileCreateMode create_mode);
+        static Result<File, IOError> make(const String path, FileAccessMode access_mode);
+        static Result<File, IOError> make(const String path, FileAccessMode access_mode, FileCreateMode create_mode);
         
         Result<u64, IOError> read(void* buffer, u64 size);
         
         Result<AllocString, IOError> read_to_string();
         
         Result<u64, IOError> write(const void* buffer, u64 size);
-        Result<u64, IOError> write(const String* str);
+        Result<u64, IOError> write(const String str);
         
         Result<void, IOError> seek(SeekFrom from, u64 bytes); 
         Result<FileMetadata, IOError> metadata();
@@ -106,23 +87,23 @@ namespace rud::os {
         void destroy() const;
     };
     
-    struct StdOut: public Writer<StdOut> {
+    struct StdOut {
         static StdOut make();
 
         Result<u64, IOError> write(const void* buffer, u64 size);
-        Result<u64, IOError> write(const String* str);
+        Result<u64, IOError> write(const String str);
     };
     
-    struct StdErr: public Writer<StdErr> {
+    struct StdErr {
         static StdErr make();
 
         Result<u64, IOError> write(const void* buffer, u64 size);
-        Result<u64, IOError> write(const String* str);
+        Result<u64, IOError> write(const String str);
     };
 
-    inline void debug_print(const String* str) {
+    inline void debug_print(const String str) {
         StdOut out = StdOut::make();
-        out.write(str).except(Lit("stdout closed").temp());
+        out.write(str).except(Lit("stdout closed"));
     }
 }
 

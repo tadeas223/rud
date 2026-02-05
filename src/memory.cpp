@@ -7,7 +7,7 @@
 
 namespace rud {
     Result<void*, AllocError> try_allocate_size(u64 size) {
-        Assert(size != 0, Lit("cannot allocate memory of size 0").temp());
+        Assert(size != 0, Lit("cannot allocate memory of size 0"));
 
         void* ptr = malloc(size);
         if(ptr == nullptr) {
@@ -18,7 +18,7 @@ namespace rud {
     }
     
     void* allocate_size(u64 size) {
-        Assert(size != 0, Lit("cannot allocate memory of size 0").temp());
+        Assert(size != 0, Lit("cannot allocate memory of size 0"));
         
         void* ptr = malloc(size);
         if(ptr == nullptr) {

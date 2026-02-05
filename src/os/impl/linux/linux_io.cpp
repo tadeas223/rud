@@ -53,13 +53,13 @@ namespace rud::os {
         int descriptor;
     };
 
-    Result<File, IOError> File::make(const String* path, FileAccessMode access_mode) {
+    Result<File, IOError> File::make(const String path, FileAccessMode access_mode) {
         int access_flags = file_access_mode_to_flags(access_mode);
         if (access_flags < 0) {
             return Result<File, IOError>::make_error(IOError::InvalidInput);
         }
         
-        ascii* cstr = path->to_cstr();
+        ascii* cstr = path.to_cstr();
         int open_result = open(cstr, access_flags);
         deallocate(cstr);
         
@@ -71,7 +71,7 @@ namespace rud::os {
         return Result<File, IOError>::make_ok(File {.handle = handle});
     }
     
-    Result<File, IOError> File::make(const String* path, FileAccessMode access_mode, FileCreateMode make_mode) {
+    Result<File, IOError> File::make(const String path, FileAccessMode access_mode, FileCreateMode make_mode) {
         int access_flags = file_access_mode_to_flags(access_mode);
         if(access_flags < 0) { 
             return Result<File, IOError>::make_error(IOError::InvalidInput);
@@ -79,7 +79,7 @@ namespace rud::os {
 
         int make_flags = file_make_mode_to_flags(make_mode);
 
-        ascii* cstr = path->to_cstr();
+        ascii* cstr = path.to_cstr();
         int open_result = open(cstr, access_flags|make_flags, new_file_permissions);
         deallocate(cstr);
         
@@ -127,8 +127,8 @@ namespace rud::os {
         return Result<AllocString, IOError>::make_ok(string);
     }
 
-    Result<u64, IOError> File::write(const String* str) {
-        return write(str->chars, str->len);
+    Result<u64, IOError> File::write(const String str) {
+        return write(str.chars, str.len);
     }
     
     Result<void, IOError> File::seek(SeekFrom from, u64 bytes) {
@@ -156,7 +156,7 @@ namespace rud::os {
     void File::destroy() const {
         int close_result = close(reinterpret_cast<InternalFileHandle*>(handle)->descriptor);
         if(close_result < 0) {
-            panic(Lit("an error occured while closing a file").temp());
+            panic(Lit("an error occured while closing a file"));
         }
         deallocate(handle);
     }
@@ -187,8 +187,8 @@ namespace rud::os {
         return Result<u64, IOError>::make_ok(write_result);
     }
 
-    Result<u64, IOError> StdOut::write(const String* str) {
-        return write(str->chars, str->len); 
+    Result<u64, IOError> StdOut::write(const String str) {
+        return write(str.chars, str.len); 
     }
 
     StdErr StdErr::make() {
@@ -204,8 +204,8 @@ namespace rud::os {
         return Result<u64, IOError>::make_ok(write_result);
     }
 
-    Result<u64, IOError> StdErr::write(const String* str) {
-        return write(str->chars, str->len); 
+    Result<u64, IOError> StdErr::write(const String str) {
+        return write(str.chars, str.len); 
     }
 
 }

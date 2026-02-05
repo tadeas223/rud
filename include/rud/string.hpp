@@ -12,8 +12,6 @@ namespace rud {
         u32 len;
 
         ascii* to_cstr() const;
-        
-        TempFuncDecl(String)
     };
     
     struct AllocString : String {

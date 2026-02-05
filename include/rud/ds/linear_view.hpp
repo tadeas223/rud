@@ -1,13 +1,12 @@
 #ifndef LINEAR_VIEW_HPP
 #define LINEAR_VIEW_HPP
 
-#include "rud/macros.hpp"
 #include "rud/types.hpp"
 namespace rud::ds {
     template<typename T>
     struct LinearView {
         const T* (*get_func)(void* ctx, u32 index);
-        T* (*set_func)(void* ctx, u32 index);
+        void (*set_func)(void* ctx, u32 index, T value);
         u32 (*len_func)(void* ctx);
 
         void* ctx;
@@ -16,8 +15,8 @@ namespace rud::ds {
             return get_func(ctx, index);
         }
         
-        T* set(u32 index) {
-            return get_func(ctx, index);
+        void set(u32 index, T value) {
+            return get_func(ctx, index, value);
         }
         
         u32 len() const {
@@ -27,12 +26,6 @@ namespace rud::ds {
         const T* operator[](u32 index) const {
             return get_func(ctx, index);
         }
-        
-        T* operator[](u32 index) {
-            return set_func(ctx, index);
-        }
-        
-        TempFuncDecl(LinearView)
     };
 }
 

@@ -44,7 +44,7 @@ namespace rud::ds {
         }
 
         T pop() {
-            Assert(p_tail != nullptr, Lit("cannot pop from an empty list").temp());
+            Assert(p_tail != nullptr, Lit("cannot pop from an empty list"));
             
             T value = p_tail->value;
             
@@ -71,7 +71,7 @@ namespace rud::ds {
         }
 
         T pop_front() {
-            Assert(p_head != nullptr, Lit("cannot pop from an empty list").temp());
+            Assert(p_head != nullptr, Lit("cannot pop from an empty list"));
 
             T value = p_head->value;
             if(p_len == 1) {
@@ -92,19 +92,19 @@ namespace rud::ds {
         }
 
         T* peek() {
-            Assert(p_tail != nullptr, Lit("cannot peek into an empty list").temp());
+            Assert(p_tail != nullptr, Lit("cannot peek into an empty list"));
 
             return &p_tail->value;
         }
 
         T* peek_front() {
-            Assert(p_head != nullptr, Lit("cannot peek into an empty list").temp());
+            Assert(p_head != nullptr, Lit("cannot peek into an empty list"));
 
             return &p_head->value;
         }
 
         const T* get(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list").temp());
+            Assert(index < p_len, Lit("index is outside of the list"));
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index; i++) {
@@ -114,19 +114,19 @@ namespace rud::ds {
             return &iter_node->value;
         }
 
-        T* set(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list").temp());
+        void set(u32 index, T value) {
+            Assert(index < p_len, Lit("index is outside of the list"));
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index; i++) {
                 iter_node = iter_node->next;
             }
 
-            return &iter_node->value;
+            iter_node->value = value;
         }
 
         T remove(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list").temp());
+            Assert(index < p_len, Lit("index is outside of the list"));
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index-1; i++) {
@@ -170,10 +170,6 @@ namespace rud::ds {
             }
         }
         
-        T* operator[](u32 index) {
-            return set(index);
-        }
-        
         const T* operator[](u32 index) const {
             return get(index);
         }
@@ -187,9 +183,9 @@ namespace rud::ds {
                 List<T>* self = static_cast<List<T>*>(ctx);
                 return self->get(index);
             };
-            view.set_func = [] (void* ctx, u32 index) { 
+            view.set_func = [] (void* ctx, u32 index, T value) { 
                 List<T>* self = static_cast<List<T>*>(ctx);
-                return self->set(index); 
+                self->set(index, value); 
             };
             view.len_func = [] (void* ctx) {
                 List<T>* self = static_cast<List<T>*>(ctx);

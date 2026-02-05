@@ -19,19 +19,15 @@ namespace rud::ds {
         }
 
         const T* get(u32 index) const {
-            Assert(index < N, Lit("index is outside of an array").temp());
+            Assert(index < N, Lit("index is outside of an array"));
 
             return &data[index];
         }
 
-        T* set(u32 index) {
-            Assert(index < N, Lit("index is outside of an array").temp());
+        void set(u32 index, T value) {
+            Assert(index < N, Lit("index is outside of an array"));
 
-            return &data[index];
-        }
-
-        T* operator[](u32 index) {
-            return set(index);
+            data[index] = value;
         }
         
         const T* operator[](u32 index) const {
@@ -47,13 +43,13 @@ namespace rud::ds {
                 Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
                 return self->get(index);
             };
-            view.set_func = [] (void* ctx, u32 index) { 
+            view.set_func = [] (void* ctx, u32 index, T value) { 
                 Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
-                return self->set(index); 
+                self->set(index, value);
             };
             view.len_func = [] (void* ctx) {
                 Array<T, N>* self = static_cast<Array<T, N>*>(ctx);
-                return self->len(); 
+                return self->len();
             };
 
             return view;

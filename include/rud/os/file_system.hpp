@@ -6,8 +6,9 @@
 #include "rud/types.hpp"
 
 namespace rud::os {
+/* --- file --- */
     using FileHandle = void*;
-    
+
     enum class FileAccessMode : u32 {
         Read = 0x01, Write = 0x02, Append = 0x04, 
     };
@@ -44,14 +45,6 @@ namespace rud::os {
         return (static_cast<u32>(a) * static_cast<u32>(b)) != 0; 
     }
 
-//    struct Directory {
-//        DirectoryHandle handle;
-//
-//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode);
-//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode, DirectoryCreateMode create_mode);
-//        Result<String, IOError> ls();
-//    };
-
     struct File {
         FileHandle handle;
 
@@ -70,6 +63,17 @@ namespace rud::os {
 
         void destroy() const;
     };
+
+/* --- directory --- */
+
+//    struct Directory {
+//        DirectoryHandle handle;
+//
+//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode);
+//        static Result<Directory, IOError> make(const String path, DirectoryAccessMode access_mode, DirectoryCreateMode create_mode);
+//        Result<String, IOError> ls();
+//    };
+
 }
 
 #endif

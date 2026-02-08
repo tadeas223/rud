@@ -1,5 +1,4 @@
 #include "rud/memory.hpp"
-#include "rud/os/io.hpp"
 #include "rud/os/system.hpp"
 #include <sys/types.h>
 #include <sys/wait.h>

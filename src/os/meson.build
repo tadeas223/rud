@@ -1,6 +1,5 @@
 sources += files(
   'system.cpp',
-  'stdout.cpp',
-  'stderr.cpp',
-  'file.cpp',
+  'standard_streams.cpp',
+  'file_system.cpp',
 )

@@ -1,5 +1,6 @@
+#include "rud/os/file_system.hpp"
+
 #include "rud/memory.hpp"
-#include "rud/os/file.hpp"
 #include <cstdio>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -45,6 +46,7 @@ namespace {
 }
 
 namespace rud::os {
+    /* --- File ---*/
     struct InternalFileHandle {
         int descriptor;
     };

@@ -1,21 +1,18 @@
-#include "rud/memory.hpp"
-
-#include "rud/ds/linear_view.hpp"
-#include "rud/os/io.hpp"
-#include "rud/os/system.hpp"
-#include <cstdio>
-
-#include "rud/ds/list.hpp"
 #include "rud/ds/array.hpp"
+#include "rud/os/file_system.hpp"
+#include "rud/os/standard_streams.hpp"
 
 using namespace rud;
 using namespace rud::ds;
 using namespace rud::os;
 
 int main (int argc, char *argv[]) {
-    Array<String, 1> array = Array<String, 1>::make();
-    array.set(0, Lit("test.txt"));
+    File file = File::make(Lit("test.txt"),
+        FileAccessMode::Write)
+    .or_panic();
 
-    run_process(Lit("cat"), array.to_linear_view());
+    file.write(Lit("test")).or_panic();
+
+    file.destroy();
     return 0;
 }

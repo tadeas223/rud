@@ -34,12 +34,13 @@ namespace rud {
     };
     
     struct StringLit: String {
+        static StringLit make(const ascii* buffer, const u32 len);
+        
         template<u32 N>
         static constexpr StringLit make(const ascii (&s)[N]) {
             return {const_cast<ascii*>(s), N-1};
         }
 
-        static StringLit make(const ascii* buffer, const u32 len);
         static StringLit make_cstr(const ascii* cstr);
     };
 

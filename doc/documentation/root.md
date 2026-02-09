@@ -12,7 +12,7 @@ the root is where the most useful stuff exists and its the place from which othe
 the basics:
 - [types](types.md)
 - [memory](memory.md)
-- [string](types.md)
+- [string](string.md)
 - [macros](types.md)
 
 error handling:

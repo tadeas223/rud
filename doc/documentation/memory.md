@@ -1,7 +1,7 @@
 # memory
 **module:** [root](root.md)
 
-**file header:** `/rud/include/memory.hpp`
+**file header:** `/include/rud/memory.hpp`
 
 **file source:** `/src/memory.cpp`
 

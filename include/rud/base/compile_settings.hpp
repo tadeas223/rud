@@ -1,7 +1,7 @@
-#ifndef RUD_COMPILE_SETTINGS_HPP
-#define RUD_COMPILE_SETTINGS_HPP
+#ifndef RUD_BASE_COMPILE_SETTINGS_HPP
+#define RUD_BASE_COMPILE_SETTINGS_HPP
 
-#include "rud/string.hpp"
+#include "rud/base/string.hpp"
 
 #define Assert(expr, msg)\
 do {\

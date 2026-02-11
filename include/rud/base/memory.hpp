@@ -1,8 +1,8 @@
-#ifndef RUD_MEMORY_HPP
-#define RUD_MEMORY_HPP
+#ifndef RUD_BASE_MEMORY_HPP
+#define RUD_BASE_MEMORY_HPP
 
-#include "rud/result.hpp"
-#include "rud/types.hpp"
+#include "rud/base/result.hpp"
+#include "rud/base/types.hpp"
 
 namespace rud {
     enum class AllocError {

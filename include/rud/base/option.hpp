@@ -1,9 +1,9 @@
-#ifndef RUD_OPTION_HPP
-#define RUD_OPTION_HPP
+#ifndef RUD_BASE_OPTION_HPP
+#define RUD_BASE_OPTION_HPP
 
-#include "rud/compile_settings.hpp"
-#include "rud/string.hpp"
-#include "rud/system.hpp"
+#include "rud/base/compile_settings.hpp"
+#include "rud/base/string.hpp"
+#include "rud/os_low/system.hpp"
 
 namespace rud {
     template<typename V>
@@ -28,12 +28,12 @@ namespace rud {
         }
         
         inline V or_panic() {
-            if(!p_is_some) panic(Lit("option had no value").temp());
+            if(!p_is_some) panic(Lit("option had no value"));
             return p_value;
         }
 
         inline V unwrap() {
-            Assert(!p_is_some, Lit("Option::unwrap called, but option does not hold a value").temp());
+            Assert(!p_is_some, Lit("Option::unwrap called, but option does not hold a value"));
             return p_value;
         }
     };

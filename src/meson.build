@@ -1,8 +1,6 @@
-subdir('os')
+subdir('base')
+subdir('os_low')
+
 sources += files(
-  'compile_settings.cpp',
-  'main.cpp',
-  'string.cpp',
-  'memory.cpp',
-  'system.cpp',
+  'main.cpp'
 )

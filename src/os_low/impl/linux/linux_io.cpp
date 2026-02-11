@@ -1,13 +1,13 @@
-#include "rud/os/file_system.hpp"
+#include "rud/os_low/io.hpp"
 
-#include "rud/memory.hpp"
+#include "rud/base/memory.hpp"
 #include <cstdio>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 using namespace rud;
-using namespace rud::os;
+using namespace rud::os_low;
 
 namespace {
     constexpr u32 new_file_permissions = 0644;
@@ -46,15 +46,14 @@ namespace {
 }
 
 namespace rud::os {
-    /* --- File ---*/
     struct InternalFileHandle {
         int descriptor;
     };
 
-    Result<File, IOError> File::make(const String path, FileAccessMode access_mode) {
+    Result<FileHandle, IOError> file_handle_make(const String path, FileAccessMode access_mode) {
         int access_flags = file_access_mode_to_flags(access_mode);
         if (access_flags < 0) {
-            return Result<File, IOError>::make_error(IOError::InvalidInput);
+            return Result<FileHandle, IOError>::make_error(IOError::InvalidInput);
         }
         
         ascii* cstr = path.to_cstr();
@@ -62,17 +61,17 @@ namespace rud::os {
         deallocate(cstr);
         
         if(open_result < 0) {
-            return Result<File, IOError>::make_error(IOError::Other); 
+            return Result<FileHandle, IOError>::make_error(IOError::Other); 
         }
         
         InternalFileHandle* handle = allocate<InternalFileHandle>({open_result});
-        return Result<File, IOError>::make_ok(File {.handle = handle});
+        return Result<FileHandle, IOError>::make_ok(handle);
     }
     
-    Result<File, IOError> File::make(const String path, FileAccessMode access_mode, FileCreateMode make_mode) {
+    Result<FileHandle, IOError> file_handle_make(const String path, FileAccessMode access_mode, FileCreateMode make_mode) {
         int access_flags = file_access_mode_to_flags(access_mode);
         if(access_flags < 0) { 
-            return Result<File, IOError>::make_error(IOError::InvalidInput);
+            return Result<FileHandle, IOError>::make_error(IOError::InvalidInput);
         }
 
         int make_flags = file_make_mode_to_flags(make_mode);
@@ -82,14 +81,14 @@ namespace rud::os {
         deallocate(cstr);
         
         if(open_result < 0) {
-            return Result<File, IOError>::make_error(IOError::Other); 
+            return Result<FileHandle, IOError>::make_error(IOError::Other); 
         }
         
         InternalFileHandle* handle = allocate<InternalFileHandle>({open_result});
-        return Result<File, IOError>::make_ok(File {.handle = handle});
+        return Result<FileHandle, IOError>::make_ok(handle);
     }
     
-    Result<u64, IOError> File::read(void* buffer, u64 size) {
+    Result<u64, IOError> file_handle_read(FileHandle* handle, void* buffer, u64 size) {
         ssize_t read_result = ::read(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
         if(read_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
@@ -98,7 +97,7 @@ namespace rud::os {
         return Result<u64, IOError>::make_ok(read_result);
     }
 
-    Result<u64, IOError> File::write(const void* buffer, u64 size) {
+    Result<u64, IOError> file_handle_write(FileHandle* handle, const void* buffer, u64 size) {
         ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
         if(write_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
@@ -107,29 +106,7 @@ namespace rud::os {
         return Result<u64, IOError>::make_ok(write_result);
     }
     
-    Result<AllocString, IOError> File::read_to_string() {
-        Result<FileMetadata, IOError> r_meta  = metadata();
-        if(!r_meta.is_ok()) {
-            return Result<AllocString, IOError>::make_error(r_meta.unwrap_error());
-        }
-        FileMetadata meta = r_meta.unwrap();
-        
-        ascii* buffer = static_cast<ascii*>(allocate_size(meta.size));
-        
-        Result<u64, IOError> r_read = read(buffer, meta.size);
-        if(!r_read.is_ok()){
-            return Result<AllocString, IOError>::make_error(r_read.unwrap_error());
-        }
-        
-        AllocString string = AllocString::make_take(buffer, meta.size);
-        return Result<AllocString, IOError>::make_ok(string);
-    }
-
-    Result<u64, IOError> File::write(const String str) {
-        return write(str.chars, str.len);
-    }
-    
-    Result<void, IOError> File::seek(FileSeekFrom from, u64 bytes) {
+    Result<void, IOError> file_handle_seek(FileHandle* handle, FileSeekFrom from, u64 bytes) {
         int whence;
         switch(from) {
             case FileSeekFrom::Current:
@@ -151,7 +128,7 @@ namespace rud::os {
         return Result<void, IOError>::make_ok();
     }
 
-    void File::destroy() const {
+    void file_handle_destroy(FileHandle* handle) {
         int close_result = close(reinterpret_cast<InternalFileHandle*>(handle)->descriptor);
         if(close_result < 0) {
             panic(Lit("an error occured while closing a file"));
@@ -159,7 +136,7 @@ namespace rud::os {
         deallocate(handle);
     }
     
-    Result<FileMetadata, IOError> File::metadata() {
+    Result<FileMetadata, IOError> file_handle_metadata(FileHandle* handle) {
         FileMetadata metadata;
         
         struct stat st;
@@ -170,5 +147,39 @@ namespace rud::os {
         metadata.size = st.st_size;
         
         return Result<FileMetadata, IOError>::make_ok(metadata);
+    }
+    
+    InternalFileHandle internal_std_in = {
+        .descriptor = 0
+    };
+
+    InternalFileHandle internal_std_out = {
+        .descriptor = 1
+    };
+
+    InternalFileHandle internal_std_err = {
+        .descriptor = 2
+    };
+
+    StdStreamHandle std_in_handle = &internal_std_in;
+    StdStreamHandle std_out_handle = &internal_std_out;
+    StdStreamHandle std_err_handle = &internal_std_err;
+
+    Result<u64, IOError> std_stream_handle_read(StdStreamHandle* handle, void* buffer, u64 size) {
+        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        if(write_result < 0) {
+            return Result<u64, IOError>::make_error(IOError::Other);
+        }
+
+        return Result<u64, IOError>::make_ok(write_result);
+    }
+
+    Result<u64, IOError> std_stream_handle_write(StdStreamHandle* handle, const void* buffer, u64 size) {
+        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        if(write_result < 0) {
+            return Result<u64, IOError>::make_error(IOError::Other);
+        }
+
+        return Result<u64, IOError>::make_ok(write_result);
     }
 }

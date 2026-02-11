@@ -1,7 +1,7 @@
-#include "rud/memory.hpp"
-#include "rud/compile_settings.hpp"
-#include "rud/result.hpp"
-#include "rud/env.hpp"
+#include "rud/base/memory.hpp"
+#include "rud/base/compile_settings.hpp"
+#include "rud/base/result.hpp"
+#include "rud/base/env.hpp"
 #include <cstdlib>
 #include <cstring>
 

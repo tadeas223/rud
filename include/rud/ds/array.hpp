@@ -1,9 +1,9 @@
 #ifndef RUD_DS_ARRAY_HPP
 #define RUD_DS_ARRAY_HPP
 
-#include "rud/compile_settings.hpp"
+#include "rud/base/compile_settings.hpp"
 #include "rud/ds/linear_view.hpp"
-#include "rud/types.hpp"
+#include "rud/base/types.hpp"
 
 namespace rud::ds {
     template<typename T, u32 N>

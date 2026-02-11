@@ -3,7 +3,7 @@
 
 #include "rud/ds/linear_view.hpp"
 #include "rud/ds/node.hpp"
-#include "rud/memory.hpp"
+#include "rud/base/memory.hpp"
 
 namespace rud::ds {
     template<typename T>

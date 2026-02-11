@@ -1,5 +1,5 @@
-#include "rud/string.hpp"
-#include "rud/memory.hpp"
+#include "rud/base/string.hpp"
+#include "rud/base/memory.hpp"
 
 namespace rud {
     AllocString AllocString::make_copy_cstr(const ascii* cstr){

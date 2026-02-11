@@ -1,5 +1,5 @@
-#ifndef RUD_MACROS_HPP
-#define RUD_MACROS_HPP
+#ifndef RUD_BASE_MACROS_HPP
+#define RUD_BASE_MACROS_HPP
 
 #define Concat(a, b) a##b
 

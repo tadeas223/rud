@@ -1,10 +1,14 @@
-#include "rud/memory.hpp"
-#include "rud/os/system.hpp"
+#include "rud/os_low/system.hpp"
+#include "rud/base/memory.hpp"
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-namespace rud::os {
+namespace rud::os_low {
+    [[noreturn]] void exit(u32 status_code) {
+        _exit(status_code);
+    }
+
     void run_process(const String msg, const ds::LinearView<String> args) {
         u32 len = args.len();
 

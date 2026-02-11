@@ -1,9 +1,9 @@
-#ifndef RUD_RESULT_HPP
-#define RUD_RESULT_HPP
+#ifndef RUD_BASE_RESULT_HPP
+#define RUD_BASE_RESULT_HPP
 
-#include "rud/compile_settings.hpp"
-#include "rud/system.hpp"
-#include "rud/string.hpp"
+#include "rud/base/compile_settings.hpp"
+#include "rud/base/system.hpp"
+#include "rud/base/string.hpp"
 
 namespace rud {
     template<typename V, typename E>

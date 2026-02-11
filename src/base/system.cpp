@@ -1,8 +1,7 @@
-#include "rud/system.hpp"
-#include "rud/ds/linear_view.hpp"
-#include "rud/memory.hpp"
+#include "rud/base/system.hpp"
+#include "rud/os_low/system.hpp"
+#include "rud/base/memory.hpp"
 #include <cstdio>
-#include <cstdlib>
 #include <unistd.h>
 
 namespace rud {
@@ -11,7 +10,7 @@ namespace rud {
         printf("program panicked\n%s\n", cstr);
         deallocate(cstr);
 
-        abort(); 
+        os_low::exit(1); 
     }
 }
 

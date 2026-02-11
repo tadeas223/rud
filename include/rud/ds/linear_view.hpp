@@ -1,7 +1,7 @@
-#ifndef LINEAR_VIEW_HPP
-#define LINEAR_VIEW_HPP
+#ifndef RUD_DS_LINEAR_VIEW_HPP
+#define RUD_DS_LINEAR_VIEW_HPP
 
-#include "rud/types.hpp"
+#include "rud/base/types.hpp"
 namespace rud::ds {
     template<typename T>
     struct LinearView {

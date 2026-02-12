@@ -15,6 +15,15 @@ namespace rud::ds {
         static List<T> make() {
             return {.p_head = nullptr, .p_tail = nullptr, .p_len = 0};
         }
+        
+        void destroy() {
+            Node<T>* node = p_head;
+            while(node != nullptr) {
+                Node<T>* remove_node = node;
+                node = node->next;
+                deallocate(remove_node);
+            }
+        }
 
         void push(T value) {
             Node<T>* new_node = allocate<Node<T>>(Node<T>::make(value));
@@ -91,40 +100,6 @@ namespace rud::ds {
             return value;
         }
 
-        T* peek() {
-            Assert(p_tail != nullptr, Lit("cannot peek into an empty list"));
-
-            return &p_tail->value;
-        }
-
-        T* peek_front() {
-            Assert(p_head != nullptr, Lit("cannot peek into an empty list"));
-
-            return &p_head->value;
-        }
-
-        const T* get(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list"));
-
-            Node<T>* iter_node = p_head;
-            for(u32 i = 0; i < index; i++) {
-                iter_node = iter_node->next;
-            }
-
-            return &iter_node->value;
-        }
-
-        void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index is outside of the list"));
-
-            Node<T>* iter_node = p_head;
-            for(u32 i = 0; i < index; i++) {
-                iter_node = iter_node->next;
-            }
-
-            iter_node->value = value;
-        }
-
         T remove(u32 index) {
             Assert(index < p_len, Lit("index is outside of the list"));
 
@@ -157,24 +132,49 @@ namespace rud::ds {
             p_len = 0;
         }
 
-        inline u32 len() {
+        T* peek() const {
+            Assert(p_tail != nullptr, Lit("cannot peek into an empty list"));
+
+            return &p_tail->value;
+        }
+
+        T* peek_front() const {
+            Assert(p_head != nullptr, Lit("cannot peek into an empty list"));
+
+            return &p_head->value;
+        }
+
+        const T* get(u32 index) const {
+            Assert(index < p_len, Lit("index is outside of the list"));
+
+            Node<T>* iter_node = p_head;
+            for(u32 i = 0; i < index; i++) {
+                iter_node = iter_node->next;
+            }
+
+            return &iter_node->value;
+        }
+
+        void set(u32 index, T value) {
+            Assert(index < p_len, Lit("index is outside of the list"));
+
+            Node<T>* iter_node = p_head;
+            for(u32 i = 0; i < index; i++) {
+                iter_node = iter_node->next;
+            }
+
+            iter_node->value = value;
+        }
+
+        inline u32 len() const {
             return p_len;
         }
 
-        void destroy() {
-            Node<T>* node = p_head;
-            while(node != nullptr) {
-                Node<T>* remove_node = node;
-                node = node->next;
-                deallocate(remove_node);
-            }
-        }
-        
         const T* operator[](u32 index) const {
             return get(index);
         }
         
-        LinearView<T> to_linear_view() {
+        LinearView<T> to_linear_view() const {
             LinearView<T> view;
 
             view.ctx = this;

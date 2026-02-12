@@ -31,6 +31,31 @@ namespace rud {
 
         return ptr;
     }
+    
+    Result<void*, AllocError> try_reallocate(void* ptr, u64 new_size) {
+        Assert(new_size != 0, Lit("cannot allocate memory of size 0"));
+        
+        void* new_ptr = realloc(ptr, new_size);
+        if(new_ptr == nullptr) {
+            return Result<void*, AllocError>::make_error(AllocError::OutOfMemory); 
+        }
+        return Result<void*, AllocError>::make_ok(new_ptr);
+    }
+
+    void* reallocate(void* ptr, u64 new_size) {
+        Assert(new_size != 0, Lit("cannot allocate memory of size 0"));
+        
+        void* new_ptr = realloc(ptr, new_size);
+        if(new_ptr == nullptr) {
+            #ifdef EXCEPTIONS_ENABLED
+            throw AllocError::OutOfMemory;
+            #else
+            panic(Lit("allocation failed"));
+            #endif
+        }
+
+        return new_ptr;
+    }
 
     void deallocate(void* ptr) {
         free(ptr); 

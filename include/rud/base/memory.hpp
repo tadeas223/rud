@@ -32,6 +32,8 @@ namespace rud {
         return ptr;
     }
     
+    void* reallocate(void* ptr, u64 new_size);
+    Result<void*, AllocError> try_reallocate(void* ptr, u64 new_size);
     void deallocate(void* ptr);
 
     void mem_copy(void* dest, const void* src, u64 size);

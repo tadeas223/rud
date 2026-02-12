@@ -15,6 +15,7 @@ namespace rud::os {
         }
         
         AllocString read_until(u8 sepparator) {
+
         }
 
         Result<u8, os_low::IOError> read_byte() {

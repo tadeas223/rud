@@ -16,9 +16,18 @@ namespace rud::ds {
             T* data = static_cast<T*>(allocate_size(sizeof(T) * 2));
             return {data, 0, 2};
         }
+        
+        static Vector make(u32 cap) {
+            T* data = static_cast<T*>(allocate_size(sizeof(T) * cap));
+            return {data, 0, cap};
+        }
 
         void destroy() {
             deallocate(p_data);
+        }
+
+        T* destroy_to_array() {
+            return p_data;
         }
 
         void push(T value) {
@@ -97,6 +106,10 @@ namespace rud::ds {
 
         u32 cap() const {
             return p_cap;
+        }
+
+        T* data() {
+            return p_data;
         }
 
         void resize(u32 new_capacity) {

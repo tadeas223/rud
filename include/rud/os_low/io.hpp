@@ -44,9 +44,8 @@ namespace rud::os_low {
 
     using FileHandle = void*;
     
-
-    Result<FileHandle, IOError> file_handle_make(const String* path, FileAccessMode access_mode, FileCreateMode create_mode);
-    Result<FileHandle, IOError> file_handle_make(const String* path, FileAccessMode access_mode);
+    Result<FileHandle, IOError> file_handle_make(const String path, FileAccessMode access_mode, FileCreateMode create_mode);
+    Result<FileHandle, IOError> file_handle_make(const String path, FileAccessMode access_mode);
         
     Result<u64, IOError> file_handle_read(FileHandle* handle, void* buffer, u64 size);
     Result<u64, IOError> file_handle_write(FileHandle* handle, const void* buffer, u64 size);
@@ -54,13 +53,13 @@ namespace rud::os_low {
     Result<void, IOError> file_handle_seek(FileHandle* handle, FileSeekFrom from, u64 bytes); 
     Result<FileMetadata, IOError> file_handle_metadata(FileHandle* handle);
 
-    Result<void, IOError> file_handle_destroy(FileHandle* handle);
+    void file_handle_destroy(FileHandle* handle);
     
     using StdStreamHandle = void*;
    
-    extern StdStreamHandle stderr_handle;
-    extern StdStreamHandle stdout_handle;
-    extern StdStreamHandle stdin_handle;
+    extern StdStreamHandle std_err_handle;
+    extern StdStreamHandle std_out_handle;
+    extern StdStreamHandle std_in_handle;
 
     Result<u64, IOError> std_stream_handle_read(StdStreamHandle* handle, void* buffer, u64 size);
     Result<u64, IOError> std_stream_handle_write(StdStreamHandle* handle, const void* buffer, u64 size);

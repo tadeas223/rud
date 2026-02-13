@@ -1,22 +1,28 @@
 #include "rud/ds/vector.hpp"
+#include "rud/os/file.hpp"
+#include "rud/os/read_stream.hpp"
+#include "rud/os/std_in.hpp"
+#include "rud/os_low/io.hpp"
+#include "rud/os_low/io_error.hpp"
 #include <cstdio>
 using namespace rud::ds;
 using namespace rud;
-int main (int argc, char *argv[]) {
-    Vector<u32> vec = Vector<u32>::make();
+using namespace rud::os;
+using namespace rud::os_low;
 
-    vec.push(1);
-    vec.push(2);
-    vec.push(3);
-    vec.push(4);
-    vec.push(5);
-
-    vec.set(3, 19);
-
-    for(u32 i = 0; i < vec.len(); i++) {
-        printf("%d\n", *vec[i]); 
+void print(String str) {
+    for(u32 i = 0; i < str.len; i++) {
+        printf("%c", str.chars[i]);
     }
+}
 
-    vec.destroy();
+int main (int argc, char *argv[]) {
+    StdIn in = StdIn::make();
+    
+    AllocString str = in.read_line().or_panic();
+
+    print(str);
+
+    str.destroy();
     return 0;
 }

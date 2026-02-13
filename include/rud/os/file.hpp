@@ -1,10 +1,11 @@
-#ifndef RUD_OS_FILE_SYSTEM_HPP
-#define RUD_OS_FILE_SYSTEM_HPP
+#ifndef RUD_OS_FILE_HPP
+#define RUD_OS_FILE_HPP
 
+#include "rud/os/read_stream.hpp"
 #include "rud/os_low/io.hpp"
 #include "rud/base/result.hpp"
 namespace rud::os {
-    struct File {
+    struct File : ReadStream<File> {
         os_low::FileHandle p_handle;
 
         static Result<File, os_low::IOError> make(const String path, os_low::FileAccessMode access_mode);
@@ -12,15 +13,12 @@ namespace rud::os {
         
         Result<u64, os_low::IOError> read(void* buffer, u64 size);
         
-        Result<AllocString, os_low::IOError> read_to_string();
-        
         Result<u64, os_low::IOError> write(const void* buffer, u64 size);
-        Result<u64, os_low::IOError> write(const String str);
         
         Result<void, os_low::IOError> seek(os_low::FileSeekFrom from, u64 bytes); 
         Result<os_low::FileMetadata, os_low::IOError> metadata();
 
-        void destroy() const;
+        void destroy();
     };
 }
 

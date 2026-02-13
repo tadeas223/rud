@@ -45,7 +45,7 @@ namespace {
     }
 }
 
-namespace rud::os {
+namespace rud::os_low {
     struct InternalFileHandle {
         int descriptor;
     };
@@ -89,7 +89,7 @@ namespace rud::os {
     }
     
     Result<u64, IOError> file_handle_read(FileHandle* handle, void* buffer, u64 size) {
-        ssize_t read_result = ::read(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        ssize_t read_result = ::read(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, buffer, size);
         if(read_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
         }
@@ -98,7 +98,7 @@ namespace rud::os {
     }
 
     Result<u64, IOError> file_handle_write(FileHandle* handle, const void* buffer, u64 size) {
-        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, buffer, size);
         if(write_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
         }
@@ -120,7 +120,7 @@ namespace rud::os {
                 break;
         }
 
-        off_t lseek_result = lseek(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, bytes, whence);
+        off_t lseek_result = lseek(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, bytes, whence);
         if(lseek_result < 0) {
             return Result<void, IOError>::make_error(IOError::Other); 
         }
@@ -129,7 +129,7 @@ namespace rud::os {
     }
 
     void file_handle_destroy(FileHandle* handle) {
-        int close_result = close(reinterpret_cast<InternalFileHandle*>(handle)->descriptor);
+        int close_result = close(reinterpret_cast<const InternalFileHandle*>(*handle)->descriptor);
         if(close_result < 0) {
             panic(Lit("an error occured while closing a file"));
         }
@@ -140,7 +140,7 @@ namespace rud::os {
         FileMetadata metadata;
         
         struct stat st;
-        if(fstat(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, &st) < 0) {
+        if(fstat(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, &st) < 0) {
             return Result<FileMetadata, IOError>::make_error(IOError::Other);
         }
 
@@ -166,7 +166,7 @@ namespace rud::os {
     StdStreamHandle std_err_handle = &internal_std_err;
 
     Result<u64, IOError> std_stream_handle_read(StdStreamHandle* handle, void* buffer, u64 size) {
-        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        ssize_t write_result = ::read(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, buffer, size);
         if(write_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
         }
@@ -175,7 +175,7 @@ namespace rud::os {
     }
 
     Result<u64, IOError> std_stream_handle_write(StdStreamHandle* handle, const void* buffer, u64 size) {
-        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(handle)->descriptor, buffer, size);
+        ssize_t write_result = ::write(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, buffer, size);
         if(write_result < 0) {
             return Result<u64, IOError>::make_error(IOError::Other);
         }

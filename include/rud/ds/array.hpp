@@ -8,7 +8,7 @@
 namespace rud::ds {
     template<typename T, u32 N>
     struct Array {
-        T data[N];
+        T p_data[N];
 
         static Array<T, N> make() {
             return {};
@@ -21,13 +21,17 @@ namespace rud::ds {
         const T* get(u32 index) const {
             Assert(index < N, Lit("index is outside of an array"));
 
-            return &data[index];
+            return &p_data[index];
         }
 
         void set(u32 index, T value) {
             Assert(index < N, Lit("index is outside of an array"));
 
-            data[index] = value;
+            p_data[index] = value;
+        }
+
+        T* data() {
+            return p_data;
         }
         
         const T* operator[](u32 index) const {

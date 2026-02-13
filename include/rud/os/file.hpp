@@ -5,7 +5,7 @@
 #include "rud/os_low/io.hpp"
 #include "rud/base/result.hpp"
 namespace rud::os {
-    struct File : ReadStream<File> {
+    struct File : ReadStream<File, os_low::IOError> {
         os_low::FileHandle p_handle;
 
         static Result<File, os_low::IOError> make(const String path, os_low::FileAccessMode access_mode);

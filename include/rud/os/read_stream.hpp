@@ -7,7 +7,7 @@
 #include "rud/ds/array.hpp"
 #include "rud/os_low/io_error.hpp"
 namespace rud::os {
-    template<typename Derived>
+    template<typename Derived, typename ResType>
     struct ReadStream {
         inline Result<u64, os_low::IOError> read(void* buffer, u64 size) {
             return reinterpret_cast<Derived*>(this)->read(buffer, size);
@@ -20,17 +20,18 @@ namespace rud::os {
             return read_until('\n');
         }
         
-        Result<AllocString, os_low::IOError> read_until(u8 sepparator) {
+        Result<AllocString, ResType> read_until(u8 sepparator) {
             ds::Vector<ascii> vec = ds::Vector<ascii>::make(512);
             
             ds::Array<ascii, 512> buffer = ds::Array<ascii, 512>();
             
             bool done = false;
             while(!done) {
-                Result<u64, os_low::IOError> result = read(buffer.data(), buffer.len());
+                Result<u64, ResType> result = read(buffer.data(), buffer.len());
                 if(result.is_error()) {
-                    return Result<AllocString, os_low::IOError>::make_error(result.unwrap_error());
+                    return Result<AllocString, ResType>::make_error(result.unwrap_error());
                 }
+
                 u32 buffer_len = result.unwrap();
                 
                 for(u32 i = 0; i < buffer_len; i++) {
@@ -45,22 +46,22 @@ namespace rud::os {
             
             u32 len = vec.len();
             AllocString str = AllocString::make_take(vec.destroy_to_array(), len);
-            return Result<AllocString, os_low::IOError>::make_ok(str);
+            return Result<AllocString, ResType>::make_ok(str);
         }
 
-        Result<u8, os_low::IOError> read_byte() {
+        Result<u8, ResType> read_byte() {
             u8 value;
 
-            Result<u64, os_low::IOError> result = read(&value, 1);
+            Result<u64, ResType> result = read(&value, 1);
             if(result.is_error()) {
-                return Result<u8, os_low::IOError>::make_error(result.unwrap_error());
+                return Result<u8, ResType>::make_error(result.unwrap_error());
             }
             
             if(result.unwrap() != 1) {
-                return Result<u8, os_low::IOError>::make_error(os_low::IOError::Other);
+                return Result<u8, ResType>::make_error(os_low::IOError::Other);
             }
 
-            return Result<u8, os_low::IOError>::make_ok(value);
+            return Result<u8, ResType>::make_ok(value);
         }
     };
 }

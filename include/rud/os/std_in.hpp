@@ -6,7 +6,7 @@
 #include "rud/base/result.hpp"
 
 namespace rud::os {
-    struct StdIn : ReadStream<StdIn> {
+    struct StdIn : ReadStream<StdIn, os_low::IOError> {
         os_low::StdStreamHandle p_handle;
 
         static StdIn make();       

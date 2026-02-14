@@ -8,7 +8,7 @@ namespace rud {
 
         mem_copy(new_chars, cstr, len);
 
-        return {new_chars, len};
+        return {{new_chars, len}};
     }
 
     AllocString AllocString::make_copy(const ascii* chars, const u32 len) {
@@ -16,15 +16,27 @@ namespace rud {
 
         mem_copy(new_chars, chars, len);
 
-        return {new_chars, len};
+        return {{new_chars, len}};
+    }
+    
+    AllocString AllocString::make_copy(String str) {
+        return make_copy(str.chars, str.len);
     }
     
     AllocString AllocString::make_take(const ascii* chars, u32 len) {
-        return {const_cast<ascii*>(chars), len}; 
+        return {{const_cast<ascii*>(chars), len}}; 
+    }
+        
+    void AllocString::push_copy(String str) {
+        chars = static_cast<ascii*>(reallocate(chars, len + str.len));
+        mem_copy(chars + len, str.chars, str.len);
+        len += str.len;
     }
 
     void AllocString::destroy() const {
-        deallocate(chars);
+        if(deallocate_on_destroy) {
+            deallocate(chars);
+        }
     }
 
     StringLit StringLit::make_cstr(const ascii* cstr) {
@@ -35,6 +47,15 @@ namespace rud {
 
     StringLit StringLit::make(const ascii* buffer, const u32 len){
         return {const_cast<ascii*>(buffer), len};
+    }
+
+    AllocString string_join(ds::LinearView<String> strings) {
+        AllocString str = AllocString::make_copy(*strings[0]);
+        for(u32 i = 1; i < strings.len(); i++) {
+            str.push_copy(*strings[i]);
+        }
+
+        return str;
     }
 
     ascii* String::to_cstr() const {

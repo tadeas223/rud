@@ -2,10 +2,13 @@
 #define RUD_BASE_STRING_HPP
 
 #include "rud/base/types.hpp"
+#include "rud/ds/linear_view.hpp"
 
 #define Lit(cstr) rud::StringLit::make(cstr)
 
 namespace rud {
+    struct AllocString;
+
     struct String {
         ascii* chars;
         u32 len;
@@ -14,6 +17,8 @@ namespace rud {
     };
     
     struct AllocString : String {
+        bool deallocate_on_destroy = true;
+
         //  debug_mode:
         //      cstr != null
         //  
@@ -21,14 +26,17 @@ namespace rud {
         static AllocString make_copy_cstr(const ascii* cstr);
         
         static AllocString make_copy(const ascii* chars, u32 len);
+        static AllocString make_copy(String str);
         
         static AllocString make_take(const ascii* chars, u32 len);
+
+        void push_copy(String str);
         
         template<u32 N>
         static constexpr AllocString make_copy(const ascii (&s)[N]) {
             return make_copy(s, N-1);
         }
-
+        
         void destroy() const;
     };
     
@@ -44,6 +52,8 @@ namespace rud {
     };
 
     u32 cstr_len(const ascii* cstr);
+
+    AllocString string_join(ds::LinearView<String> strings);
 }
 
 #endif

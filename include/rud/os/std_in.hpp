@@ -11,8 +11,6 @@ namespace rud::os {
 
         static StdIn make();       
         Result<u64, os_low::IOError> read(void* buffer, u64 size);
-        Result<u64, os_low::IOError> write(const void* buffer, u64 size);
-        void destroy();
     };
 }
 

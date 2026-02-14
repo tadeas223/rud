@@ -2,6 +2,7 @@
 #include "rud/os/file.hpp"
 #include "rud/os/read_stream.hpp"
 #include "rud/os/std_in.hpp"
+#include "rud/os/std_out.hpp"
 #include "rud/os_low/io.hpp"
 #include "rud/os_low/io_error.hpp"
 #include <cstdio>
@@ -19,10 +20,12 @@ void print(String str) {
 int main (int argc, char *argv[]) {
     StdIn in = StdIn::make();
     
+    debug_print(Lit("your name: "));
     AllocString str = in.read_line().or_panic();
-
-    print(str);
+    debug_print(Lit("hello, "));
+    debug_print(str);
 
     str.destroy();
+
     return 0;
 }

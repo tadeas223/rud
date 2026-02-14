@@ -2,10 +2,11 @@
 #define RUD_OS_FILE_HPP
 
 #include "rud/os/read_stream.hpp"
+#include "rud/os/write_stream.hpp"
 #include "rud/os_low/io.hpp"
 #include "rud/base/result.hpp"
 namespace rud::os {
-    struct File : ReadStream<File, os_low::IOError> {
+    struct File : ReadStream<File, os_low::IOError>, WriteStream<File, os_low::IOError> {
         os_low::FileHandle p_handle;
 
         static Result<File, os_low::IOError> make(const String path, os_low::FileAccessMode access_mode);

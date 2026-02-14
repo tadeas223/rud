@@ -11,9 +11,5 @@ namespace rud::os {
     Result<u64, os_low::IOError> StdIn::read(void* buffer, u64 size) {
         return os_low::std_stream_handle_read(&p_handle, buffer, size);
     }
-    
-    Result<u64, os_low::IOError> StdIn::write(const void* buffer, u64 size) {
-        return os_low::std_stream_handle_write(&p_handle, buffer, size);
-    }
 
 }

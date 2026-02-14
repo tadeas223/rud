@@ -1,7 +1,7 @@
+subdir('base')
 subdir('os')
+subdir('os_low')
+
 sources += files(
-  'main.cpp',
-  'string.cpp',
-  'memory.cpp',
-  'system.cpp',
+  'main.cpp'
 )

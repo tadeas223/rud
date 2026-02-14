@@ -1,29 +1,27 @@
-#include "rud/memory.hpp"
-#include "rud/os/io.hpp"
+#include "rud/base/string.hpp"
+#include "rud/os/std_in.hpp"
+#include "rud/os/std_out.hpp"
 
+using namespace rud::ds;
 using namespace rud;
 using namespace rud::os;
-
-template <typename Writeable>
-Result<void, IOError> write_hello(Writer<Writeable>& writer) {
-    Result<u64, IOError> r_write = writer.write(Lit("hello\n"));
-    if(!r_write.ok) {
-        return Result<void, IOError>::make_error(r_write.error);
-    }
-    return Result<void, IOError>::make_ok();
-}
+using namespace rud::os_low;
 
 int main (int argc, char *argv[]) {
-    File file = File::make(Lit("test.txt"),
-        FileAccessMode::Read|FileAccessMode::Write,
-        FileCreateMode::Create
-    ).except(Lit("failed to open or create a file"));
-    
-    StdOut out = StdOut::make();
+    StdIn in = StdIn::make();
 
-    write_hello(out).except(Lit("failed to write to stdout"));
-    write_hello(file).except(Lit("failed to write to a file"));
+    debug_print(Lit("your name: "));
 
-    file.destroy();
+    AllocString name = in.read_line().or_panic();
+
+    Vector<String> format = Vector<String>::make();
+    format.push(Lit("hello, "));
+    format.push(name);
+
+    AllocString format_str = string_join(format.to_linear_view());
+    debug_print(format_str);
+
+    format_str.destroy();
+    name.destroy();
     return 0;
 }

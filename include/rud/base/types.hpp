@@ -1,5 +1,5 @@
-#ifndef RUD_TYPES_HPP
-#define RUD_TYPES_HPP
+#ifndef RUD_BASE_TYPES_HPP
+#define RUD_BASE_TYPES_HPP
 
 namespace rud {
     using u8 = unsigned char;
@@ -11,7 +11,7 @@ namespace rud {
     using s16 = signed short;
     using s32 = signed int;
     using s64 = signed long;
-
+    
     using ascii = char;
 }
 

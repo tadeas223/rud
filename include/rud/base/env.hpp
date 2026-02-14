@@ -1,5 +1,5 @@
-#ifndef RUD_ENV_HPP
-#define RUD_ENV_HPP
+#ifndef RUD_BASE_ENV_HPP
+#define RUD_BASE_ENV_HPP
 
 #if defined (__linux__)
 #define OS_LINUX

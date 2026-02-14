@@ -1,0 +1,17 @@
+#ifndef RUD_BASE_MACROS_HPP
+#define RUD_BASE_MACROS_HPP
+
+#define Concat(a, b) a##b
+
+#define Expand(x) x
+
+#define Stringify(x) Stringify2(x)
+#define Stringify2(x) #x
+#define LineString Stringify(__LINE__)
+
+#define TempFuncDecl(T)\
+    inline const T* temp() {\
+        return this;\
+    }\
+
+#endif

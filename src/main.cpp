@@ -14,14 +14,14 @@ int main (int argc, char *argv[]) {
 
     AllocString name = in.read_line().or_panic();
 
-    Vector<String> format = Vector<String>::make();
-    format.push(Lit("hello, "));
-    format.push(name);
+    AllocString str = AllocString::make();
+    str.push_copy(Lit("hello, "))
+        ->push_copy(name);
+    
+    debug_print(str);
 
-    AllocString format_str = string_join(format.to_linear_view());
-    debug_print(format_str);
-
-    format_str.destroy();
     name.destroy();
+    str.destroy();
+
     return 0;
 }

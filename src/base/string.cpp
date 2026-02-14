@@ -27,10 +27,15 @@ namespace rud {
         return {{const_cast<ascii*>(chars), len}}; 
     }
         
-    void AllocString::push_copy(String str) {
+    AllocString AllocString::make() {
+        return {{nullptr, 0}};
+    }
+        
+    AllocString* AllocString::push_copy(String str) {
         chars = static_cast<ascii*>(reallocate(chars, len + str.len));
         mem_copy(chars + len, str.chars, str.len);
         len += str.len;
+        return this;
     }
 
     void AllocString::destroy() const {

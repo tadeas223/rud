@@ -25,12 +25,14 @@ namespace rud {
         //  not checked: cstr must be null terminated
         static AllocString make_copy_cstr(const ascii* cstr);
         
+        static AllocString make();
+        
         static AllocString make_copy(const ascii* chars, u32 len);
         static AllocString make_copy(String str);
         
         static AllocString make_take(const ascii* chars, u32 len);
 
-        void push_copy(String str);
+        AllocString* push_copy(String str);
         
         template<u32 N>
         static constexpr AllocString make_copy(const ascii (&s)[N]) {

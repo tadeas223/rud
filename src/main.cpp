@@ -6,6 +6,7 @@
 #include "rud/os_low/io.hpp"
 #include "rud/os_low/io_error.hpp"
 #include <cstdio>
+
 using namespace rud::ds;
 using namespace rud;
 using namespace rud::os;

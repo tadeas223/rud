@@ -7,7 +7,7 @@ using namespace rud;
 namespace rud::os {
     Result<File, os_low::IOError> File::make(const String path, os_low::FileAccessMode access_mode) {
         Result<FileHandle, IOError> r_handle = file_handle_make(path, access_mode);
-        if(r_handle.is_error()) {
+        if(!r_handle.ok) {
             return Result<File, IOError>::make_error(r_handle.unwrap_error());
         }
 
@@ -16,7 +16,7 @@ namespace rud::os {
 
     Result<File, os_low::IOError> File::make(const String path, os_low::FileAccessMode access_mode, os_low::FileCreateMode create_mode) {
         Result<FileHandle, IOError> r_handle = file_handle_make(path, access_mode, create_mode);
-        if(r_handle.is_error()) {
+        if(!r_handle.ok) {
             return Result<File, IOError>::make_error(r_handle.unwrap_error());
         }
 

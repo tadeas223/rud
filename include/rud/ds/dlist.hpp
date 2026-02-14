@@ -8,16 +8,16 @@
 namespace rud::ds {
     template<typename T>
     struct DList {
-        DNode<T>* p_head;
-        DNode<T>* p_tail;
-        u32 p_len;
+        DNode<T>* head;
+        DNode<T>* tail;
+        u32 len;
 
         static DList<T> make() {
-            return {.p_head = nullptr, .p_tail = nullptr, .p_len = 0};
+            return {.head = nullptr, .p_tail = nullptr, .p_len = 0};
         }
         
         void destroy() {
-            DNode<T>* node = p_head;
+            DNode<T>* node = head;
             while(node != nullptr) {
                 DNode<T>* remove_node = node;
                 node = node->next;
@@ -28,82 +28,82 @@ namespace rud::ds {
         void push(T value) {
             DNode<T>* new_node = allocate<DNode<T>>(DNode<T>::make(value));
 
-            if(p_head == nullptr) {
-                p_head = new_node;
-                p_tail = new_node;
+            if(head == nullptr) {
+                head = new_node;
+                tail = new_node;
             } else {
-                p_tail->next = new_node;
-                new_node->prev = p_tail;
-                p_tail = new_node;
+                tail->next = new_node;
+                new_node->prev = tail;
+                tail = new_node;
             }
 
-            p_len++;
+            len++;
         }
 
         void push_front(T value) {
             DNode<T>* new_node = allocate<DNode<T>>(DNode<T>::make(value));
             
-            p_head->prev = new_node;
-            new_node->next = p_head;
-            p_head = new_node;
+            head->prev = new_node;
+            new_node->next = head;
+            head = new_node;
 
-            if(p_tail == nullptr) {
-                p_tail = new_node;
+            if(tail == nullptr) {
+                tail = new_node;
             }
             
-            p_len++;
+            len++;
         }
 
         T pop() {
-            Assert(p_tail != nullptr, Lit("cannot pop from an empty list"));
+            Assert(tail != nullptr, Lit("cannot pop from an empty list"));
             
-            T value = p_tail->value;
+            T value = tail->value;
             
-            if(p_len == 1) {
-                deallocate(p_head);
-                p_len = 0;
-                p_head = nullptr;
-                p_tail = nullptr;
+            if(len == 1) {
+                deallocate(head);
+                len = 0;
+                head = nullptr;
+                tail = nullptr;
                 return value;
             }
 
-            DNode<T>* remove_node = p_tail;
+            DNode<T>* remove_node = tail;
 
-            p_tail = p_tail->prev;
-            p_tail->next = nullptr;
+            tail = tail->prev;
+            tail->next = nullptr;
             
             deallocate(remove_node);
         
-            p_len--;
+            len--;
             return value;
         }
 
         T pop_front() {
-            Assert(p_head != nullptr, Lit("cannot pop from an empty list"));
+            Assert(head != nullptr, Lit("cannot pop from an empty list"));
 
-            T value = p_head->value;
-            if(p_len == 1) {
-                deallocate(p_head);
-                p_len = 0;
-                p_head = nullptr;
-                p_tail = nullptr;
+            T value = head->value;
+            if(len == 1) {
+                deallocate(head);
+                len = 0;
+                head = nullptr;
+                tail = nullptr;
                 return value;
             }
             
-            DNode<T>* remove_node = p_head;
-            p_head = p_head->next;
-            p_head->prev = nullptr;
+            DNode<T>* remove_node = head;
+            head = head->next;
+            head->prev = nullptr;
             deallocate(remove_node);
 
-            p_len--;
+            len--;
 
             return value;
         }
 
         T remove(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Assert(index < len, Lit("index is outside of the list"));
 
-            DNode<T>* iter_node = p_head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index-1; i++) {
                 iter_node = iter_node->next;
             }
@@ -115,39 +115,39 @@ namespace rud::ds {
             iter_node->next = remove_node->next;
             deallocate(remove_node);
             
-            p_len--;
+            len--;
 
             return value;
         }
 
         void clear() {
-            DNode<T>* node = p_head;
+            DNode<T>* node = head;
             while(node != nullptr) {
                 DNode<T>* remove_node = node;
                 node = node->next;
                 deallocate(remove_node);
             }
-            p_head = nullptr;
-            p_tail = nullptr;
-            p_len = 0;
+            head = nullptr;
+            tail = nullptr;
+            len = 0;
         }
 
         T* peek() const {
-            Assert(p_tail != nullptr, Lit("cannot peek into an empty list"));
+            Assert(tail != nullptr, Lit("cannot peek into an empty list"));
 
-            return &p_tail->value;
+            return &tail->value;
         }
 
         T* peek_front() const {
-            Assert(p_head != nullptr, Lit("cannot peek into an empty list"));
+            Assert(head != nullptr, Lit("cannot peek into an empty list"));
 
-            return &p_head->value;
+            return &head->value;
         }
 
         const T* get(u32 index) const {
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Assert(index < len, Lit("index is outside of the list"));
 
-            DNode<T>* iter_node = p_head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index; i++) {
                 iter_node = iter_node->next;
             }
@@ -156,18 +156,14 @@ namespace rud::ds {
         }
 
         void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Assert(index < len, Lit("index is outside of the list"));
 
-            DNode<T>* iter_node = p_head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index; i++) {
                 iter_node = iter_node->next;
             }
 
             iter_node->value = value;
-        }
-
-        inline u32 len() const {
-            return p_len;
         }
 
         const T* operator[](u32 index) const {
@@ -189,7 +185,7 @@ namespace rud::ds {
             };
             view.len_func = [] (void* ctx) {
                 DList<T>* self = static_cast<DList<T>*>(ctx);
-                return self->len(); 
+                return self->len; 
             };
 
             return view;

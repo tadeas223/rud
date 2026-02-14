@@ -9,100 +9,84 @@ namespace rud {
     template<typename V, typename E>
     struct [[nodiscard]] Result {
         union {
-            V p_value;
-            E p_error;
+            V value;
+            E error;
         };
 
-        bool p_is_ok;
+        bool ok;
 
         inline static Result<V, E> make_ok(V value) {
-            return {.p_value = value, .p_is_ok = true};
+            return {.value = value, .ok = true};
         }
         
         inline static Result<V, E> make_error(E error) {
-            return {.p_error = error, .p_is_ok = false};
+            return {.error = error, .ok = false};
         }
        
         template<typename Lambda>
         inline V try_or(Lambda l) {
-            if(!p_is_ok) return l();
-            return p_value;
+            if(!ok) return l();
+            return value;
         }
 
         inline V except(const String msg) {
-            if(!p_is_ok) panic(msg);
-            return p_value;
+            if(!ok) panic(msg);
+            return value;
         }
 
         inline V or_panic() {
-            if(!p_is_ok) panic(Lit("unhandled error occured"));
-            return p_value;
+            if(!ok) panic(Lit("unhandled error occured"));
+            return value;
         }
  
-        inline bool is_ok() {
-            return p_is_ok; 
-        }
-        
-        inline bool is_error() {
-            return !p_is_ok; 
-        }
-
         V unwrap() {
-            Assert(p_is_ok == true, Lit("Result::value() called, but result contained an error"));
+            Assert(ok == true, Lit("Result::value() called, but result contained an error"));
 
-            return p_value;
+            return value;
         }
 
         E unwrap_error() {
-            Assert(p_is_ok == false, Lit("Result::error() called, but result contained a value"));
+            Assert(ok == false, Lit("Result::error() called, but result contained a value"));
 
-            return p_error;
+            return error;
         }
     };
     
     
     template<typename E>
     struct [[nodiscard]] Result<void, E> {
-        E p_error;
-        bool p_is_ok;
+        E error;
+        bool ok;
         
         inline static Result<void, E> make_ok() {
-            return {.p_is_ok = true};
+            return {.ok = true};
         }
         
         inline static Result<void, E> make_error(E error) {
-            return {.p_error = error, .p_is_ok = true};
+            return {.error = error, .ok = true};
         }
 
         inline void except(const String msg) {
-            if(!p_is_ok) panic(msg);
+            if(!ok) panic(msg);
         }
         
         template<typename Lambda>
         inline void try_or(Lambda l) {
-            if(!p_is_ok) l();
-        }
-
-        inline bool is_ok() {
-            return p_is_ok; 
-        }
-
-        inline bool is_error() {
-            return !p_is_ok; 
+            if(!ok) l();
         }
 
         inline void or_panic() {
-            if(!p_is_ok) panic(Lit("unhandled error occured"));
+            if(!ok) panic(Lit("unhandled error occured"));
         }
 
         void unwrap() {
-            Assert(p_is_ok == true, Lit("Result::value() called, but result contained an error"));
+            Assert(ok == true, Lit("Result::value() called, but result contained an error"));
         }
 
         E unwrap_error() {
-            Assert(p_is_ok == false, Lit("Result::error() called, but result contained a value"));
+            Assert(ok == false, Lit("Result::error() called, but result contained a value"));
 
-            return p_error;
+            return error;
         }
     };
 }

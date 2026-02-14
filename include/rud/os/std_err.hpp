@@ -1,7 +1,6 @@
 #ifndef RUD_OS_STD_ERR_HPP
 #define RUD_OS_STD_ERR_HPP
 
-#include "rud/os/read_stream.hpp"
 #include "rud/os/write_stream.hpp"
 #include "rud/os_low/io.hpp"
 #include "rud/base/result.hpp"

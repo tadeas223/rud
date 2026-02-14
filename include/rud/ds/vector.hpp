@@ -8,9 +8,9 @@
 namespace rud::ds {
     template<typename T>
     struct Vector {
-        T* p_data;
-        u32 p_len;
-        u32 p_cap;
+        T* data;
+        u32 len;
+        u32 cap;
 
         static Vector make() {
             T* data = static_cast<T*>(allocate_size(sizeof(T) * 2));
@@ -23,100 +23,88 @@ namespace rud::ds {
         }
 
         void destroy() {
-            deallocate(p_data);
+            deallocate(data);
         }
 
         T* destroy_to_array() {
-            return p_data;
+            return data;
         }
 
         void push(T value) {
-            if(p_len + 1 > p_cap) {
-                resize(p_cap * 2);
+            if(len + 1 > cap) {
+                resize(cap * 2);
             }
 
-            p_data[p_len] = value;
-            p_len++;
+            data[len] = value;
+            len++;
         }
 
         void push_front(T value) {
-            if(p_len + 1 > p_cap) {
-                resize(p_cap * 2);
+            if(len + 1 > cap) {
+                resize(cap * 2);
             }
 
-            mem_move(p_data + 1, p_data, p_len);
-            p_data[0] = value;
+            mem_move(data + 1, data, len);
+            data[0] = value;
             
-            p_len++;
+            len++;
         
         }
 
         T pop() {
-            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
-            p_len--;
-            return p_data[p_len];
+            Assert(len != 0, Lit("cannot pop from an empty vector"));
+            len--;
+            return data[len];
         }
 
         T pop_front() {
-            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
+            Assert(len != 0, Lit("cannot pop from an empty vector"));
             
-            T value = p_data[0];
-            p_len--;
-            mem_move(p_data, p_data + 1, p_len);
+            T value = data[0];
+            len--;
+            mem_move(data, data + 1, len);
             return value;
         }
 
         void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index outside of a vector"));
+            Assert(index < len, Lit("index outside of a vector"));
 
-            p_data[index] = value;
+            data[index] = value;
         }
 
         T remove(u32 index) {
-            Assert(index < p_len, Lit("index outside of a vector"));
+            Assert(index < len, Lit("index outside of a vector"));
             
-            T value = p_data[index];
-            mem_move(p_data + index, p_data + index - 1, p_len - index - 1);
-            p_len--;
+            T value = data[index];
+            mem_move(data + index, data + index - 1, len - index - 1);
+            len--;
             return value;
         }
 
         void clear() {
-            p_len = 0;
+            len = 0;
         }
 
 
         T* peek() const {
-            Assert(p_len != 0, Lit("cannot peek empty vector"));
-            return &p_data[p_len-1];
+            Assert(len != 0, Lit("cannot peek empty vector"));
+            return &data[len-1];
         }
 
         T* peek_front() const {
-            Assert(p_len != 0, Lit("cannot peek empty vector"));
-            return &p_data[0];
+            Assert(len != 0, Lit("cannot peek empty vector"));
+            return &data[0];
         }
 
         const T* get(u32 index) const {
-            return &p_data[index];
-        }
-
-        u32 len() const {
-            return p_len;
-        }
-
-        u32 cap() const {
-            return p_cap;
-        }
-
-        T* data() {
-            return p_data;
+            return &data[index];
         }
 
         void resize(u32 new_capacity) {
-            Assert(new_capacity > p_len, Lit("Vector::resize would be less than its current length"));
+            Assert(new_capacity > len, Lit("Vector::resize would be less than its current length"));
 
-            p_data = static_cast<T*>(reallocate(p_data, sizeof(T) * new_capacity));
-            p_cap = new_capacity;
+            data = static_cast<T*>(reallocate(data, sizeof(T) * new_capacity));
+            cap = new_capacity;
         }
         
         const T* operator[](u32 index) const {
@@ -138,7 +126,7 @@ namespace rud::ds {
             };
             view.len_func = [] (void* ctx) {
                 Vector<T>* self = static_cast<Vector<T>*>(ctx);
-                return self->len(); 
+                return self->len;
             };
 
             return view;

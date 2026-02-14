@@ -1,7 +1,6 @@
 #ifndef RUD_BASE_STRING_HPP
 #define RUD_BASE_STRING_HPP
 
-#include "rud/base/macros.hpp"
 #include "rud/base/types.hpp"
 
 #define Lit(cstr) rud::StringLit::make(cstr)

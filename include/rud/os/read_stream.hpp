@@ -13,9 +13,6 @@ namespace rud::os {
             return reinterpret_cast<Derived*>(this)->read(buffer, size);
         }
 
-        // Result<AllocString, os_low::IOError> read_all() {
-        // }
-        
         Result<AllocString, ErrType> read_line() {
             return read_until('\n');
         }
@@ -27,8 +24,8 @@ namespace rud::os {
             
             bool done = false;
             while(!done) {
-                Result<u64, ErrType> result = read(buffer.data(), buffer.len());
-                if(result.is_error()) {
+                Result<u64, ErrType> result = read(buffer.data, buffer.len());
+                if(!result.ok) {
                     return Result<AllocString, ErrType>::make_error(result.unwrap_error());
                 }
 
@@ -44,7 +41,7 @@ namespace rud::os {
                 }
             }
             
-            u32 len = vec.len();
+            u32 len = vec.len;
             AllocString str = AllocString::make_take(vec.destroy_to_array(), len);
             return Result<AllocString, ErrType>::make_ok(str);
         }
@@ -53,7 +50,7 @@ namespace rud::os {
             u8 value;
 
             Result<u64, ErrType> result = read(&value, 1);
-            if(result.is_error()) {
+            if(!result.ok) {
                 return Result<u8, ErrType>::make_error(result.unwrap_error());
             }
             

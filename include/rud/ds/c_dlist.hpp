@@ -1,38 +1,39 @@
-#ifndef RUD_DS_LIST_HPP
-#define RUD_DS_LIST_HPP
+#ifndef RUD_DS_DLIST_HPP
+#define RUD_DS_DLIST_HPP
 
 #include "rud/ds/linear_view.hpp"
-#include "rud/ds/node.hpp"
+#include "rud/ds/dnode.hpp"
 #include "rud/base/memory.hpp"
 
 namespace rud::ds {
     template<typename T>
-    struct List {
-        Node<T>* head;
-        Node<T>* tail;
+    struct C_DList {
+        DNode<T>* head;
+        DNode<T>* tail;
         u32 len;
 
-        static List<T> make() {
-            return {.head = nullptr, .tail = nullptr, .len = 0};
+        static C_DList<T> make() {
+            return {.head = nullptr, .p_tail = nullptr, .p_len = 0};
         }
         
         void destroy() {
-            Node<T>* node = head;
+            DNode<T>* node = head;
             while(node != nullptr) {
-                Node<T>* remove_node = node;
+                DNode<T>* remove_node = node;
                 node = node->next;
                 deallocate(remove_node);
             }
         }
 
         void push(T value) {
-            Node<T>* new_node = allocate<Node<T>>(Node<T>::make(value));
+            DNode<T>* new_node = allocate<DNode<T>>(DNode<T>::make(value));
 
             if(head == nullptr) {
                 head = new_node;
                 tail = new_node;
             } else {
                 tail->next = new_node;
+                new_node->prev = tail;
                 tail = new_node;
             }
 
@@ -40,8 +41,9 @@ namespace rud::ds {
         }
 
         void push_front(T value) {
-            Node<T>* new_node = allocate<Node<T>>(Node<T>::make(value));
+            DNode<T>* new_node = allocate<DNode<T>>(DNode<T>::make(value));
             
+            head->prev = new_node;
             new_node->next = head;
             head = new_node;
 
@@ -65,15 +67,12 @@ namespace rud::ds {
                 return value;
             }
 
-            Node<T>* iter_node = head;
-            while(iter_node->next != tail) {
-                iter_node = iter_node->next;
-            }
+            DNode<T>* remove_node = tail;
+
+            tail = tail->prev;
+            tail->next = nullptr;
             
-            deallocate(iter_node->next);
-            
-            tail = iter_node;
-            iter_node->next = nullptr;
+            deallocate(remove_node);
         
             len--;
             return value;
@@ -91,8 +90,9 @@ namespace rud::ds {
                 return value;
             }
             
-            Node<T>* remove_node = head;
+            DNode<T>* remove_node = head;
             head = head->next;
+            head->prev = nullptr;
             deallocate(remove_node);
 
             len--;
@@ -103,12 +103,12 @@ namespace rud::ds {
         T remove(u32 index) {
             Assert(index < len, Lit("index is outside of the list"));
 
-            Node<T>* iter_node = head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index-1; i++) {
                 iter_node = iter_node->next;
             }
             
-            Node<T>* remove_node = iter_node->next;
+            DNode<T>* remove_node = iter_node->next;
             
             T value = remove_node->value;
             
@@ -121,9 +121,9 @@ namespace rud::ds {
         }
 
         void clear() {
-            Node<T>* node = head;
+            DNode<T>* node = head;
             while(node != nullptr) {
-                Node<T>* remove_node = node;
+                DNode<T>* remove_node = node;
                 node = node->next;
                 deallocate(remove_node);
             }
@@ -147,7 +147,7 @@ namespace rud::ds {
         const T* get(u32 index) const {
             Assert(index < len, Lit("index is outside of the list"));
 
-            Node<T>* iter_node = head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index; i++) {
                 iter_node = iter_node->next;
             }
@@ -158,7 +158,7 @@ namespace rud::ds {
         void set(u32 index, T value) {
             Assert(index < len, Lit("index is outside of the list"));
 
-            Node<T>* iter_node = head;
+            DNode<T>* iter_node = head;
             for(u32 i = 0; i < index; i++) {
                 iter_node = iter_node->next;
             }
@@ -176,15 +176,15 @@ namespace rud::ds {
             view.ctx = this;
 
             view.get_func = [](void* ctx, u32 index) {
-                List<T>* self = static_cast<List<T>*>(ctx);
+                C_DList<T>* self = static_cast<C_DList<T>*>(ctx);
                 return self->get(index);
             };
             view.set_func = [] (void* ctx, u32 index, T value) { 
-                List<T>* self = static_cast<List<T>*>(ctx);
+                C_DList<T>* self = static_cast<C_DList<T>*>(ctx);
                 self->set(index, value); 
             };
             view.len_func = [] (void* ctx) {
-                List<T>* self = static_cast<List<T>*>(ctx);
+                C_DList<T>* self = static_cast<C_DList<T>*>(ctx);
                 return self->len; 
             };
 

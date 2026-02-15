@@ -1,7 +1,8 @@
+#include "rud/os/std_in.hpp"
+
 #include "rud/base/result.hpp"
 #include "rud/base/types.hpp"
 #include "rud/os_low/io_error.hpp"
-#include "rud/os/std_in.hpp"
 
 namespace rud::os {
         StdIn StdIn::make() {

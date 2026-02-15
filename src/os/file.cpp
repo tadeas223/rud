@@ -1,11 +1,12 @@
 #include "rud/os/file.hpp"
+
 #include "rud/os_low/io.hpp"
 
 using namespace rud::os_low;
 using namespace rud;
 
 namespace rud::os {
-    Result<File, os_low::IOError> File::make(const String path, os_low::FileAccessMode access_mode) {
+    Result<File, os_low::IOError> File::make(StringView path, os_low::FileAccessMode access_mode) {
         Result<FileHandle, IOError> r_handle = file_handle_make(path, access_mode);
         if(!r_handle.ok) {
             return Result<File, IOError>::make_error(r_handle.unwrap_error());
@@ -14,7 +15,7 @@ namespace rud::os {
         return Result<File, IOError>::make_ok(File{.p_handle = r_handle.unwrap() });
     }
 
-    Result<File, os_low::IOError> File::make(const String path, os_low::FileAccessMode access_mode, os_low::FileCreateMode create_mode) {
+    Result<File, os_low::IOError> File::make(StringView path, os_low::FileAccessMode access_mode, os_low::FileCreateMode create_mode) {
         Result<FileHandle, IOError> r_handle = file_handle_make(path, access_mode, create_mode);
         if(!r_handle.ok) {
             return Result<File, IOError>::make_error(r_handle.unwrap_error());

@@ -42,25 +42,21 @@ namespace rud::ds {
             len++;
         }
 
-        void push_front(T value) { 
+        inline void push_front(T value) { 
             if(len == cap) { 
                 resize(CapIncrease(cap)); 
-            }
-
+            } 
             mem_move(data + 1, data, len * sizeof(T)); 
             data[0] = value;
             len++;
         }
 
         inline T* push_uninitialized() {
-            if(len == cap) {
-                resize(CapIncrease(cap));
-            }
-
+            if(len == cap) resize(CapIncrease(cap));
             return &data[len++];
         }
         
-        T* push_front_uninitialized() {
+        inline T* push_front_uninitialized() {
             if(len == cap) {
                 resize(CapIncrease(cap));
             }
@@ -77,7 +73,7 @@ namespace rud::ds {
             return data[len];
         }
 
-        T pop_front() {
+        inline T pop_front() {
             Assert(len != 0, Lit("cannot pop from an empty vector"));
             
             T value = data[0];
@@ -92,7 +88,7 @@ namespace rud::ds {
             data[index] = value;
         }
 
-        T remove(u32 index) {
+        inline T remove(u32 index) {
             Assert(index < len, Lit("index outside of a vector"));
             
             T value = data[index];

@@ -173,7 +173,7 @@ namespace rud::ds {
             return get(index);
         }
         
-        LinearView<T> to_linear_view() const {
+        LinearView<T> to_linear_view() {
             LinearView<T> view;
 
             view.ctx = this;

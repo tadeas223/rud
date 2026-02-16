@@ -19,7 +19,7 @@ namespace rud::os {
         }
         
         Result<C_StringAlloc, ErrType> read_until(u8 sepparator) {
-            ds::C_Vector<ascii> vec = ds::C_Vector<ascii>::make(512);
+            ds::C_DArray<ascii> vec = ds::C_DArray<ascii>::make(512);
 
             ds::Array<ascii, 512> buffer = ds::Array<ascii, 512>();
             

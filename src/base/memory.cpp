@@ -61,13 +61,23 @@ namespace rud {
     void deallocate(void* ptr) {
         free(ptr); 
     }
-
+    
     void mem_copy(void* dest, const void* src, u64 size) {
-        memcpy(dest, src, size);
+        while(size--) {
+            reinterpret_cast<u8*>(dest)[size] = reinterpret_cast<const u8*>(src)[size];
+        }
     }
 
     void mem_move(void* dest, const void* src, u64 size) {
-        memmove(dest, src, size);
+        if(dest > src) {
+            while(size--) {
+                reinterpret_cast<u8*>(dest)[size] = reinterpret_cast<const u8*>(src)[size];
+            }
+        } else {
+            for(u32 i = 0; i < size; ++i) {
+                reinterpret_cast<u8*>(dest)[i] = reinterpret_cast<const u8*>(src)[i];
+            }
+        }
     }
 
     void mem_set(void* dest, const u32 value, u64 size) {

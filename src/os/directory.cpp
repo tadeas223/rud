@@ -26,7 +26,7 @@ namespace rud::os {
         return Result<C_Directory, IOError>::make_ok({handle});
     }
     
-    Result<ds::C_Vector<os_low::C_DirEntry>, os_low::IOError> C_Directory::get_entries(u32 entry_count) {
+    Result<ds::C_DArray<os_low::C_DirEntry>, os_low::IOError> C_Directory::get_entries(u32 entry_count) {
         return c_directory_handle_get_entries(&handle, entry_count);
     }
 

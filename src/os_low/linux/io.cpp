@@ -55,16 +55,6 @@ namespace {
         
         return flags;
     }
-    
-    int directory_create_mode_to_flags(DirectoryCreateMode mode) {
-        int flags = 0;
-
-        if(mode * DirectoryCreateMode::Create) {
-            flags |= O_CREAT; 
-        }
-        
-        return flags;
-    }
 }
 
 namespace rud::os_low {
@@ -180,6 +170,8 @@ namespace rud::os_low {
             case FileSeekFrom::End:
                 whence = SEEK_END;
                 break;
+            default: [[unlikely]] 
+                return Result<void, IOError>::make_error(IOError::Other);
         }
 
         off_t lseek_result = lseek(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor, bytes, whence);
@@ -259,10 +251,29 @@ namespace rud::os_low {
     }
 
     Result<C_DirectoryHandle, IOError> c_directory_handle_make(StringView path, DirectoryCreateMode create_mode) {
-        int flags = directory_create_mode_to_flags(create_mode);
-
         ascii* cstr = path.to_cstr();
-        int open_result = open(cstr, flags | O_DIRECTORY);
+        int open_result = -1;
+        
+        if(create_mode == DirectoryCreateMode::CreateIfDoesntExist) {
+            int fd = open(cstr, O_RDONLY | O_DIRECTORY);
+            if (fd >= 0) {
+                open_result = fd;
+            } else {
+                create_mode = DirectoryCreateMode::Create;
+            }
+        }
+
+        if(create_mode == DirectoryCreateMode::Create) {
+            if (mkdir(cstr, 0755) < 0) {
+                deallocate(cstr);
+                return Result<C_DirectoryHandle, IOError>::make_error(IOError::Other);
+            }
+        }
+
+
+        if(open_result == -1) {
+            open_result = open(cstr, O_DIRECTORY);
+        }
         deallocate(cstr);
         
         if(open_result < 0) {
@@ -273,8 +284,8 @@ namespace rud::os_low {
         return Result<C_DirectoryHandle, IOError>::make_ok(handle);
     }
 
-    Result<ds::C_Vector<C_DirEntry>, IOError> c_directory_handle_get_entries(C_DirectoryHandle* handle, u32 entry_count) {
-        C_Vector<C_DirEntry> vec = C_Vector<C_DirEntry>::make();
+    Result<ds::C_DArray<C_DirEntry>, IOError> c_directory_handle_get_entries(C_DirectoryHandle* handle, u32 entry_count) {
+        C_DArray<C_DirEntry> vec = C_DArray<C_DirEntry>::make();
         char buf[1024];
         
         while(true) {
@@ -285,7 +296,7 @@ namespace rud::os_low {
             );
             
             if(nread < 0) {
-                return Result<C_Vector<C_DirEntry>, IOError>::make_error(IOError::Other);
+                return Result<C_DArray<C_DirEntry>, IOError>::make_error(IOError::Other);
             }
             
             if(nread == 0) {
@@ -306,7 +317,7 @@ namespace rud::os_low {
             }
         }
 
-        return Result<C_Vector<C_DirEntry>, IOError>::make_ok(vec);
+        return Result<C_DArray<C_DirEntry>, IOError>::make_ok(vec);
     }
 
     void c_directory_handle_destroy(C_DirectoryHandle* handle) {

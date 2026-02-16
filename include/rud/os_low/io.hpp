@@ -26,6 +26,7 @@ namespace rud::os_low {
 
     enum class DirectoryCreateMode : u32 {
         Create = 0x01,
+        CreateIfDoesntExist = 0x02,
     };
 
     inline DirectoryCreateMode operator|(DirectoryCreateMode a, DirectoryCreateMode b) {
@@ -39,7 +40,7 @@ namespace rud::os_low {
     Result<C_DirectoryHandle, IOError> c_directory_handle_make(StringView path);
     Result<C_DirectoryHandle, IOError> c_directory_handle_make(StringView path, DirectoryCreateMode create_mode);
 
-    Result<ds::C_Vector<C_DirEntry>, IOError> c_directory_handle_get_entries(C_DirectoryHandle* handle, u32 entry_count);
+    Result<ds::C_DArray<C_DirEntry>, IOError> c_directory_handle_get_entries(C_DirectoryHandle* handle, u32 entry_count);
 
     void c_directory_handle_destroy(C_DirectoryHandle* handle);
 

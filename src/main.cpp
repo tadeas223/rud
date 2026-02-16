@@ -1,19 +1,15 @@
-#include "rud/os/directory.hpp"
-#include "rud/os/file.hpp"
-#include "rud/os/std_out.hpp"
+#include <stdio.h>
+#include "rud/ds/c_darray.hpp"
+#include "rud/base/memory.hpp"
 
-using namespace rud::os;
-using namespace rud;
-using namespace rud::os_low;
 using namespace rud::ds;
-
+using namespace rud;
 int main (int argc, char *argv[]) {
-    C_Directory dir = C_Directory::make(Lit("doc")).or_panic();
+    const char* s1 = "hello";
+    char s2[6];
     
-    C_File file = C_File::make(&dir, Lit("test.txt"), FileAccessMode::Write, FileCreateMode::Create).or_panic();
+    mem_copy(s2, s1, 6);
 
-    file.destroy();
-    
-    dir.destroy();
+    printf("%s\n", s2);
     return 0;
 }

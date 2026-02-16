@@ -11,7 +11,7 @@ namespace rud::os {
         static Result<C_Directory, os_low::IOError> make(StringView path);
         static Result<C_Directory, os_low::IOError> make(StringView path, os_low::DirectoryCreateMode create_mode);
         
-        Result<ds::C_Vector<os_low::C_DirEntry>, os_low::IOError> get_entries(u32 entry_count);        
+        Result<ds::C_DArray<os_low::C_DirEntry>, os_low::IOError> get_entries(u32 entry_count);        
 
         void destroy();
     };

@@ -96,7 +96,7 @@ namespace rud::ds {
             return &data[0];
         }
 
-        const T* get(u32 index) const {
+        T* get(u32 index) const {
             return &data[index];
         }
 
@@ -107,7 +107,7 @@ namespace rud::ds {
             cap = new_capacity;
         }
         
-        const T* operator[](u32 index) const {
+        T* operator[](u32 index) const {
             return get(index);
         }
         

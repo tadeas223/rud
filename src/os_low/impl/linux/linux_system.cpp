@@ -10,7 +10,7 @@ namespace rud::os_low {
         _exit(status_code);
     }
 
-    void run_process(StringView msg, const ds::LinearView<StringView> args) {
+    void run_process(StringView msg, ds::LinearView<StringView> args) {
         u32 len = args.len();
 
         ascii* cstr_msg = msg.to_cstr();

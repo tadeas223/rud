@@ -147,7 +147,7 @@ namespace rud::ds {
             return &head->value;
         }
 
-        const T* get(u32 index) const {
+        T* get(u32 index) const {
             Assert(index < len, Lit("index is outside of the list"));
 
             Node<T>* iter_node = head;
@@ -169,7 +169,7 @@ namespace rud::ds {
             iter_node->value = value;
         }
 
-        const T* operator[](u32 index) const {
+        T* operator[](u32 index) const {
             return get(index);
         }
         

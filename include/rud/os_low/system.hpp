@@ -5,7 +5,7 @@
 #include "rud/base/string.hpp"
 namespace rud::os_low {
     [[noreturn]] void exit(u32 status_code);
-    void run_process(StringView msg, const ds::LinearView<StringView> args);
+    void run_process(StringView msg, ds::LinearView<StringView> args);
 }
 
 #endif

@@ -1,4 +1,5 @@
 #include "rud/base/memory.hpp"
+
 #include "rud/base/compile_settings.hpp"
 #include "rud/base/result.hpp"
 #include "rud/base/env.hpp"

@@ -133,7 +133,7 @@ namespace rud::os_low {
         if(close_result < 0) {
             panic(Lit("an error occured while closing a file"));
         }
-        deallocate(handle);
+        deallocate(*handle);
     }
     
     Result<FileMetadata, IOError> file_handle_metadata(FileHandle* handle) {

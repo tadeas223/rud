@@ -3,9 +3,10 @@
 
 #include "rud/base/result.hpp"
 #include "rud/base/types.hpp"
-#include "rud/ds/vector.hpp"
+#include "rud/ds/c_vector.hpp"
 #include "rud/ds/array.hpp"
 #include "rud/os_low/io_error.hpp"
+
 namespace rud::os {
     template<typename Derived, typename ErrType>
     struct ReadStream {
@@ -13,20 +14,20 @@ namespace rud::os {
             return reinterpret_cast<Derived*>(this)->read(buffer, size);
         }
 
-        Result<AllocString, ErrType> read_line() {
+        Result<C_StringAlloc, ErrType> read_line() {
             return read_until('\n');
         }
         
-        Result<AllocString, ErrType> read_until(u8 sepparator) {
-            ds::Vector<ascii> vec = ds::Vector<ascii>::make(512);
-            
+        Result<C_StringAlloc, ErrType> read_until(u8 sepparator) {
+            ds::C_Vector<ascii> vec = ds::C_Vector<ascii>::make(512);
+
             ds::Array<ascii, 512> buffer = ds::Array<ascii, 512>();
             
             bool done = false;
             while(!done) {
                 Result<u64, ErrType> result = read(buffer.data, buffer.len());
                 if(!result.ok) {
-                    return Result<AllocString, ErrType>::make_error(result.unwrap_error());
+                    return Result<C_StringAlloc, ErrType>::make_error(result.unwrap_error());
                 }
 
                 u32 buffer_len = result.unwrap();
@@ -42,8 +43,8 @@ namespace rud::os {
             }
             
             u32 len = vec.len;
-            AllocString str = AllocString::make_take(vec.destroy_to_array(), len);
-            return Result<AllocString, ErrType>::make_ok(str);
+            C_StringAlloc str = C_StringAlloc::make_take(vec.destroy_to_array(), len);
+            return Result<C_StringAlloc, ErrType>::make_ok(str);
         }
 
         Result<u8, ErrType> read_byte() {

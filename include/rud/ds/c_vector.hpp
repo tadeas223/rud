@@ -7,17 +7,17 @@
 #include "rud/ds/linear_view.hpp"
 namespace rud::ds {
     template<typename T>
-    struct Vector {
+    struct C_Vector {
         T* data;
         u32 len;
         u32 cap;
 
-        static Vector make() {
+        static C_Vector make() {
             T* data = static_cast<T*>(allocate_size(sizeof(T) * 2));
             return {data, 0, 2};
         }
         
-        static Vector make(u32 cap) {
+        static C_Vector make(u32 cap) {
             T* data = static_cast<T*>(allocate_size(sizeof(T) * cap));
             return {data, 0, cap};
         }
@@ -44,7 +44,7 @@ namespace rud::ds {
                 resize(cap * 2);
             }
 
-            mem_move(data + 1, data, len);
+            mem_move(data + 1, data, len * sizeof(T));
             data[0] = value;
             
             len++;
@@ -62,7 +62,7 @@ namespace rud::ds {
             
             T value = data[0];
             len--;
-            mem_move(data, data + 1, len);
+            mem_move(data, data + 1, len * sizeof(T));
             return value;
         }
 
@@ -76,7 +76,7 @@ namespace rud::ds {
             Assert(index < len, Lit("index outside of a vector"));
             
             T value = data[index];
-            mem_move(data + index, data + index - 1, len - index - 1);
+            mem_move(data + index, data + index - 1, (len - index - 1) * sizeof(T));
             len--;
             return value;
         }
@@ -117,15 +117,15 @@ namespace rud::ds {
             view.ctx = this;
 
             view.get_func = [](void* ctx, u32 index) {
-                Vector<T>* self = static_cast<Vector<T>*>(ctx);
+                C_Vector<T>* self = static_cast<C_Vector<T>*>(ctx);
                 return self->get(index);
             };
             view.set_func = [] (void* ctx, u32 index, T value) { 
-                Vector<T>* self = static_cast<Vector<T>*>(ctx);
+                C_Vector<T>* self = static_cast<C_Vector<T>*>(ctx);
                 self->set(index, value); 
             };
             view.len_func = [] (void* ctx) {
-                Vector<T>* self = static_cast<Vector<T>*>(ctx);
+                C_Vector<T>* self = static_cast<C_Vector<T>*>(ctx);
                 return self->len;
             };
 

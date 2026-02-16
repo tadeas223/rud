@@ -29,7 +29,7 @@ namespace rud {
             return value;
         }
 
-        inline V except(const String msg) {
+        inline V except(StringView msg) {
             if(!ok) panic(msg);
             return value;
         }
@@ -66,7 +66,7 @@ namespace rud {
             return {.error = error, .ok = true};
         }
 
-        inline void except(const String msg) {
+        inline void except(StringView msg) {
             if(!ok) panic(msg);
         }
         

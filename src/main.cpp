@@ -1,27 +1,15 @@
-#include "rud/base/string.hpp"
-#include "rud/os/std_in.hpp"
-#include "rud/os/std_out.hpp"
+#include "rud/os/file.hpp"
 
-using namespace rud::ds;
-using namespace rud;
 using namespace rud::os;
+using namespace rud;
 using namespace rud::os_low;
 
 int main (int argc, char *argv[]) {
-    StdIn in = StdIn::make();
+    File file = File::make(Lit("test.txt"),
+        FileAccessMode::Write, FileCreateMode::Create).or_panic();
 
-    debug_print(Lit("your name: "));
+    file.write_str(Lit("hello")).or_panic();
 
-    AllocString name = in.read_line().or_panic();
-
-    Vector<String> format = Vector<String>::make();
-    format.push(Lit("hello, "));
-    format.push(name);
-
-    AllocString format_str = string_join(format.to_linear_view());
-    debug_print(format_str);
-
-    format_str.destroy();
-    name.destroy();
+    file.destroy();
     return 0;
 }

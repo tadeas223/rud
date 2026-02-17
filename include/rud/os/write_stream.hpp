@@ -11,7 +11,7 @@ namespace rud::os {
             return reinterpret_cast<Derived*>(this)->write(buffer, size);
         }
 
-        inline Result<void, ErrType> write_str(String str) {
+        inline Result<void, ErrType> write_str(StringView str) {
             Result<u64, ErrType> r_written = write(str.chars, str.len);
             if(!r_written.ok) {
                 return Result<void, ErrType>::make_error(r_written.unwrap_error());

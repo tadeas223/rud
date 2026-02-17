@@ -14,7 +14,7 @@ namespace rud::os {
         return std_stream_handle_write(&p_handle, buffer, size);
     }
 
-    void debug_print(String str) {
+    void debug_print(StringView str) {
         StdOut::make().write_str(str).or_panic();
     }
 }

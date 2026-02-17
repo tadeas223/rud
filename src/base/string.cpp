@@ -1,9 +1,6 @@
 #include "rud/base/string.hpp"
 
 #include "rud/base/memory.hpp"
-#include "rud/arch_low/memory.hpp"
-
-using namespace rud::arch_low;
 
 namespace rud {
     C_StringAlloc C_StringAlloc::make_copy_cstr(const ascii* cstr){

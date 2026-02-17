@@ -14,7 +14,7 @@ namespace rud::os {
         Result<u64, os_low::IOError> write(const void* buffer, u64 size);
     };
 
-    void debug_print(String str);
+    void debug_print(StringView str);
 }
 
 #endif

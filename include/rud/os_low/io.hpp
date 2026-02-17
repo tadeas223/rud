@@ -5,7 +5,7 @@
 #include "rud/base/string.hpp"
 #include "rud/base/types.hpp"
 #include "rud/os_low/io_error.hpp"
-#include "rud/ds/c_vector.hpp"
+#include "rud/ds/c_darray.hpp"
 
 namespace rud::os_low {
     using C_DirectoryHandle = void*;
@@ -16,11 +16,15 @@ namespace rud::os_low {
     };
 
     struct C_DirEntry {
-        C_StringAlloc name;
+        C_StringAlloc p_name;
         DirEntryType type;
         
+        inline const C_StringAlloc name() const {
+            return p_name;
+        }
+
         inline void destroy() {
-            name.destroy();
+            p_name.destroy();
         }
     };
 

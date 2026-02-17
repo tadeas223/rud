@@ -3,7 +3,7 @@
 
 #include "rud/base/result.hpp"
 #include "rud/base/types.hpp"
-#include "rud/ds/c_vector.hpp"
+#include "rud/ds/c_darray.hpp"
 #include "rud/ds/array.hpp"
 #include "rud/os_low/io_error.hpp"
 
@@ -43,7 +43,7 @@ namespace rud::os {
             }
             
             u32 len = vec.len;
-            C_StringAlloc str = C_StringAlloc::make_take(vec.destroy_to_array(), len);
+            C_StringAlloc str = C_StringAlloc::make_take(vec.destroy_to_pointer(), len);
             return Result<C_StringAlloc, ErrType>::make_ok(str);
         }
 

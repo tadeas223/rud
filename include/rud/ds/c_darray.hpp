@@ -1,155 +1,168 @@
-#ifndef RUD_DS_VECTOR_HPP
-#define RUD_DS_VECTOR_HPP
+#ifndef RUD_DS_C_DARRAY_HPP
+#define RUD_DS_C_DARRAY_HPP
 
 #include "rud/base/compile_settings.hpp"
 #include "rud/base/memory.hpp"
 #include "rud/base/types.hpp"
 #include "rud/ds/linear_view.hpp"
 
-// #define CAP_INCREASE cap + (cap >> 1)
 #define CapIncrease(prev) prev * 2 
+
 namespace rud::ds {
     template<typename T>
     struct C_DArray {
-        T* data;
-        u32 len;
-        u32 cap;
+        T* p_data;
+        u32 p_len;
+        u32 p_cap;
 
+// get_set {{{ 
+        inline const T* data() const {
+            return p_data;
+        }
+
+        inline u32 len() const {
+            return p_len;
+        }
+
+        inline u32 cap() const {
+            return p_cap;
+        }
+// }}}
+
+// make_destroy {{{ 
         static inline C_DArray make() {
-            T* data = static_cast<T*>(allocate_size(sizeof(T) * 2));
-            return {data, 0, 2};
+            T* p_data = static_cast<T*>(allocate_size(sizeof(T) * 2));
+            return {p_data, 0, 2};
         }
         
-        static inline C_DArray make(u32 cap) {
-            T* data = static_cast<T*>(allocate_size(sizeof(T) * cap));
-            return {data, 0, cap};
+        static inline C_DArray make(u32 p_cap) {
+            T* p_data = static_cast<T*>(allocate_size(sizeof(T) * p_cap));
+            return {p_data, 0, p_cap};
         }
-
+        
         inline void destroy() {
-            deallocate(data);
+            deallocate(p_data);
         }
-
-        inline T* destroy_to_array() {
-            return data;
-        }
-
-        inline void push(T value) {
-            if(len == cap) [[unlikely]] {
-                resize(CapIncrease(cap));
+       
+        inline void destroy(void (*destroy_func)(T value)) {
+            for(u32 i = 0; i < p_len; ++i) {
+                destroy_func(p_data[i]);
             }
 
-            data[len] = value;
-            len++;
+            deallocate(p_data);
+        }
+
+        inline T* destroy_to_pointer() {
+            return p_data;
+        }
+// }}}
+
+        inline void push(T value) {
+            if(p_len == p_cap) [[unlikely]] {
+                resize(CapIncrease(p_cap));
+            }
+
+            p_data[p_len] = value;
+            p_len++;
         }
 
         inline void push_front(T value) { 
-            if(len == cap) { 
-                resize(CapIncrease(cap)); 
+            if(p_len == p_cap) { 
+                resize(CapIncrease(p_cap)); 
             } 
-            mem_move(data + 1, data, len * sizeof(T)); 
-            data[0] = value;
-            len++;
-        }
-
-        inline T* push_uninitialized() {
-            if(len == cap) resize(CapIncrease(cap));
-            return &data[len++];
-        }
-        
-        inline T* push_front_uninitialized() {
-            if(len == cap) {
-                resize(CapIncrease(cap));
-            }
-
-            mem_move(data + 1, data, len * sizeof(T));
-            
-            len++;
-            return &data[0];
+            mem_move(p_data + 1, p_data, p_len * sizeof(T)); 
+            p_data[0] = value;
+            p_len++;
         }
 
         inline T pop() {
-            Assert(len != 0, Lit("cannot pop from an empty vector"));
-            len--;
-            return data[len];
+            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
+            p_len--;
+            return p_data[p_len];
         }
 
         inline T pop_front() {
-            Assert(len != 0, Lit("cannot pop from an empty vector"));
+            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
             
-            T value = data[0];
-            len--;
-            mem_move(data, data + 1, len * sizeof(T));
+            T value = p_data[0];
+            p_len--;
+            mem_move(p_data, p_data + 1, p_len * sizeof(T));
             return value;
         }
 
         inline void set(u32 index, T value) {
-            Assert(index < len, Lit("index outside of a vector"));
+            Assert(index < p_len, Lit("index outside of a vector"));
 
-            data[index] = value;
+            p_data[index] = value;
         }
 
         inline T remove(u32 index) {
-            Assert(index < len, Lit("index outside of a vector"));
+            Assert(index < p_len, Lit("index outside of a vector"));
             
-            T value = data[index];
-            mem_copy(data + index, 
-                    data + index + 1,
-                    (len - index - 1) * sizeof(T)
+            if(index == 0) {
+                return pop_front();
+            }
+
+            T value = p_data[index];
+            mem_copy(p_data + index, 
+                    p_data + index + 1,
+                    (p_len - index - 1) * sizeof(T)
             );
 
-            len--;
+            p_len--;
             return value;
         }
 
         inline void clear() {
-            len = 0;
-        }
-
-
-        inline T* peek() const {
-            Assert(len != 0, Lit("cannot peek empty vector"));
-            return &data[len-1];
-        }
-
-        inline T* peek_front() const {
-            Assert(len != 0, Lit("cannot peek empty vector"));
-            return &data[0];
-        }
-
-        inline T* get(u32 index) const {
-            return &data[index];
-        }
-
-        inline void resize(u32 new_capacity) {
-            data = static_cast<T*>(reallocate(data, sizeof(T) * new_capacity));
-            cap = new_capacity;
+            p_len = 0;
         }
         
-        inline T* operator[](u32 index) const {
+        inline void clear(void (*destroy_func)(T value)) {
+            for(u32 i = 0; i < p_len; ++i) {
+                destroy_func(p_data[i]);
+            }
+            p_len = 0;
+        }
+        
+        inline T* peek() {
+            Assert(p_len != 0, Lit("cannot peek empty vector"));
+            return &p_data[p_len-1];
+        }
+
+        inline T* peek_front() {
+            Assert(p_len != 0, Lit("cannot peek empty vector"));
+            return &p_data[0];
+        }
+
+        inline T* get(u32 index) {
+            return &p_data[index];
+        }
+
+        inline void resize(u32 new_p_capacity) {
+            p_data = static_cast<T*>(reallocate(p_data, sizeof(T) * new_p_capacity));
+            p_cap = new_p_capacity;
+        }
+        
+        inline T* operator[](u32 index) {
             return get(index);
         }
         
         inline LinearView<T> to_linear_view() {
-            LinearView<T> view;
-
-            view.ctx = this;
-
-            view.get_func = [](void* ctx, u32 index) {
-                C_DArray<T>* self = static_cast<C_DArray<T>*>(ctx);
-                return self->get(index);
-            };
-            view.set_func = [] (void* ctx, u32 index, T value) { 
-                C_DArray<T>* self = static_cast<C_DArray<T>*>(ctx);
-                self->set(index, value); 
-            };
-            view.len_func = [] (void* ctx) {
-                C_DArray<T>* self = static_cast<C_DArray<T>*>(ctx);
-                return self->len;
-            };
-
-            return view;
+            return LinearView<T>::make(
+                this,
+                [] (void* ctx) {
+                    C_DArray<T>* self = static_cast<C_DArray<T>*>(ctx);
+                    return self->p_len;
+                },
+                [](void* ctx, u32 index) {
+                    C_DArray<T>* self = static_cast<C_DArray<T>*>(ctx);
+                    return self->get(index);
+                }
+            );
         }
+
     };
+
 }
 
 #undef CapIncrease

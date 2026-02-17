@@ -308,7 +308,7 @@ namespace rud::os_low {
                 struct linux_dirent64 *d = (struct linux_dirent64 *)(buf + bpos);
                 
                 C_DirEntry entry = {
-                    .name = C_StringAlloc::make_copy_cstr(d->d_name),
+                    .p_name = C_StringAlloc::make_copy_cstr(d->d_name),
                     .type = (d->d_type == DT_REG)? DirEntryType::File : DirEntryType::Directory
                 };
 

@@ -1,8 +1,8 @@
 project('rud', 'cpp', default_options: ['cpp_std=c++20'])
 
 add_project_arguments([
-  '-O3',
-  '-march=native'
+  '-O0',
+  # '-march=native'
 ],language: 'cpp')
 
 sources = []

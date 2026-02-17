@@ -104,6 +104,9 @@ namespace rud::os_low {
 
     Result<u64, IOError> std_stream_handle_read(StdStreamHandle* handle, void* buffer, u64 size);
     Result<u64, IOError> std_stream_handle_write(StdStreamHandle* handle, const void* buffer, u64 size);
+
+    Result<void, IOError> directory_handle_set_current_directory(C_DirectoryHandle* handle); 
+    Result<C_DirectoryHandle, IOError> directory_handle_get_current_directory(); 
 }
 
 #endif

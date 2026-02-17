@@ -1,4 +1,5 @@
 #include "rud/os_low/io.hpp"
+#include <memory>
 #include <sys/types.h>
 
 #include "rud/base/memory.hpp"
@@ -326,5 +327,18 @@ namespace rud::os_low {
             panic(Lit("an error occured while closing a directory"));
         }
         deallocate(*handle);
+    }
+    
+    Result<void, IOError> directory_handle_set_current_directory(C_DirectoryHandle* handle) { 
+        int result = fchdir(reinterpret_cast<InternalFileHandle*>(*handle)->descriptor);
+        if(result < 0) {
+            return Result<void, IOError>::make_error(IOError::Other);
+        }
+
+        return Result<void, IOError>::make_ok();
+    }
+    
+    Result<C_DirectoryHandle, IOError> directory_handle_get_current_directory() {
+        return c_directory_handle_make(Lit("."));
     }
 }

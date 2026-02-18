@@ -1,7 +1,7 @@
 #include "rud/base/compile_settings.hpp"
 
-#include "rud/os/std_out.hpp"
-#include "rud/os/std_err.hpp"
+#include "rud/os/platform/std_out.hpp"
+#include "rud/os/platform/std_err.hpp"
 
 using namespace rud::os;
 

@@ -1,5 +1,5 @@
-#ifndef RUD_OS_WRITE_STREAM_HPP
-#define RUD_OS_WRITE_STREAM_HPP
+#ifndef RUD_OS_CORE_WRITE_STREAM_HPP
+#define RUD_OS_CORE_WRITE_STREAM_HPP
 
 #include "rud/base/result.hpp"
 #include "rud/base/types.hpp"

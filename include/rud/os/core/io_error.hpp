@@ -1,7 +1,7 @@
-#ifndef RUD_OS_LOW_IO_ERROR_HPP
-#define RUD_OS_LOW_IO_ERROR_HPP
+#ifndef RUD_OS_IO_ERROR_HPP
+#define RUD_OS_IO_ERROR_HPP
 
-namespace rud::os_low {
+namespace rud::os {
     enum class IOError {
         NotFound,
         PermissionDenied,

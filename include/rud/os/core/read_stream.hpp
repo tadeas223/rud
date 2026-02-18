@@ -1,11 +1,11 @@
-#ifndef RUD_OS_READ_STREAM_HPP
-#define RUD_OS_READ_STREAM_HPP
+#ifndef RUD_OS_CORE_READ_STREAM_HPP
+#define RUD_OS_CORE_READ_STREAM_HPP
 
 #include "rud/base/result.hpp"
 #include "rud/base/types.hpp"
 #include "rud/ds/c_darray.hpp"
 #include "rud/ds/array.hpp"
-#include "rud/os_low/io_error.hpp"
+#include "rud/os/core/io_error.hpp"
 
 namespace rud::os {
     template<typename Derived, typename ErrType>
@@ -25,7 +25,7 @@ namespace rud::os {
             
             bool done = false;
             while(!done) {
-                Result<u64, ErrType> result = read(buffer.data, buffer.len());
+                Result<u64, ErrType> result = read(buffer.data(), buffer.len());
                 if(!result.ok) {
                     return Result<C_StringAlloc, ErrType>::make_error(result.unwrap_error());
                 }
@@ -42,7 +42,7 @@ namespace rud::os {
                 }
             }
             
-            u32 len = vec.len;
+            u32 len = vec.len();
             C_StringAlloc str = C_StringAlloc::make_take(vec.destroy_to_pointer(), len);
             return Result<C_StringAlloc, ErrType>::make_ok(str);
         }
@@ -56,7 +56,7 @@ namespace rud::os {
             }
             
             if(result.unwrap() != 1) {
-                return Result<u8, ErrType>::make_error(os_low::IOError::Other);
+                return Result<u8, ErrType>::make_error(IOError::Other);
             }
 
             return Result<u8, ErrType>::make_ok(value);

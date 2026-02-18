@@ -9,9 +9,4 @@
 #define Stringify2(x) #x
 #define LineString Stringify(__LINE__)
 
-#define TempFuncDecl(T)\
-    inline const T* temp() {\
-        return this;\
-    }\
-
 #endif

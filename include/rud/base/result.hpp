@@ -63,7 +63,7 @@ namespace rud {
         }
         
         inline static Result<void, E> make_error(E error) {
-            return {.error = error, .ok = true};
+            return {.error = error, .ok = false};
         }
 
         inline void except(StringView msg) {

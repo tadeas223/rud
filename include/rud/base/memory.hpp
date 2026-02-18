@@ -17,12 +17,16 @@ namespace rud {
     
     template<typename T>
     inline Result<T*, AllocError> try_allocate(T original) {
-        Result<T*, AllocError> r_ptr = static_cast<T*>(try_allocate_size(sizeof(T)));
-        if(r_ptr.is_ok()) {
-            *r_ptr.unwrap() = original;
+        Result<void*, AllocError> r_ptr = try_allocate_size(sizeof(T));
+        if(r_ptr.ok) {
+            T* ptr = static_cast<T*>(r_ptr.unwrap());
+            *ptr = original;
+            return Result<T*, AllocError>::make_ok(ptr);
+        } else {
+            return Result<T*, AllocError>::make_error(r_ptr.unwrap_error());
         }
+        
 
-        return r_ptr;
     }
   
     template<typename T>
@@ -38,7 +42,7 @@ namespace rud {
 
     void mem_copy(void* dest, const void* src, u64 size);
     void mem_move(void* dest, const void* src, u64 size);
-    void mem_set(void* dest, const u8 value, u64 size);
+    void mem_set(void* dest, u8 value, u64 size);
     bool mem_equals(const void* ptr1, const void* ptr2, u64 size);
 }
 

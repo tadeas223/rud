@@ -71,11 +71,16 @@ namespace rud {
         }
     }
 
-    void mem_set(void* dest, const u32 value, u64 size) {
+    void mem_set(void* dest, u8 value, u64 size) {
         memset(dest, value, size);
     }
 
     bool mem_equals(const void* ptr1, const void* ptr2, u64 size) {
-        return memcmp(ptr1, ptr2, size); 
+        while(size--) {
+            if(reinterpret_cast<const u8*>(ptr1)[size] != reinterpret_cast<const u8*>(ptr2)[size]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

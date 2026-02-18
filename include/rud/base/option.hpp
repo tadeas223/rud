@@ -25,7 +25,7 @@ namespace rud {
         }
 
         inline V unwrap() {
-            Assert(!some, Lit("Option::unwrap called, but option does not hold a value"));
+            Assert(some, Lit("Option::unwrap called, but option does not hold a value"));
             return value;
         }
     };

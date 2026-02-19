@@ -2,6 +2,7 @@
 
 #include "rud/base/result.hpp"
 #include "rud/base/env.hpp"
+#include "rud/base/system.hpp"
 #include <cstdlib>
 #include <cstring>
 
@@ -29,6 +30,9 @@ namespace rud {
     }
     
     Result<void*, AllocError> try_reallocate(void* ptr, u64 new_size) {
+        if(new_size == 0) {
+            new_size = 1;
+        }
         void* new_ptr = realloc(ptr, new_size);
         if(new_ptr == nullptr) {
             return Result<void*, AllocError>::make_error(AllocError::OutOfMemory); 
@@ -37,12 +41,15 @@ namespace rud {
     }
 
     void* reallocate(void* ptr, u64 new_size) {
+        if(new_size == 0) {
+            new_size = 1;
+        }
         void* new_ptr = realloc(ptr, new_size);
         if(new_ptr == nullptr) {
             #ifdef EXCEPTIONS_ENABLED
             throw AllocError::OutOfMemory;
             #else
-            panic(Lit("allocation failed"));
+            panic(Lit("reallocation failed"));
             #endif
         }
 
@@ -50,6 +57,9 @@ namespace rud {
     }
 
     void deallocate(void* ptr) {
+        if(ptr == nullptr) {
+            panic(Lit("deallocating a null pointer"));
+        }
         free(ptr); 
     }
     

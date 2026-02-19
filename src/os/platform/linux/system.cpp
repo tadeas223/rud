@@ -1,6 +1,7 @@
 #include "rud/os/platform/system.hpp"
 
 #include "rud/base/memory.hpp"
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -8,6 +9,10 @@
 namespace rud::os {
     [[noreturn]] void exit(u32 status_code) {
         _exit(status_code);
+    }
+    
+    [[noreturn]] void abort() {
+        ::abort();
     }
 
     void run_process(StringView msg, ds::LinearView<StringView> args) {

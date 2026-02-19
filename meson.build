@@ -27,7 +27,6 @@ rud_dep = declare_dependency(
 
 meson.override_dependency('rud', rud_dep)
 
-subdir('benchmark')
 subdir('test')
 
 executable('main', 'src/main.cpp', dependencies: rud_dep)

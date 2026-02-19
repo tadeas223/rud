@@ -1,225 +1,406 @@
-#include <gtest/gtest.h>
+#include "catch2/catch_test_macros.hpp"
+#include "catch2/generators/catch_generators.hpp"
+#include "catch2/generators/catch_generators_random.hpp"
+#include "catch2/generators/catch_generators_adapters.hpp"
+
 #include "rud/base/memory.hpp"
+#include "helpers.hpp"
 #include "rud/base/types.hpp"
+#include <catch2/catch_tostring.hpp>
+#include <limits>
 
 using namespace rud;
 
-//
-// allocation basics
-//
+SCENARIO("trying to allocate an arbitrary number of bytes works correctly", "[try_allocate_size]") {
+    GIVEN("0 bytes") {
+        constexpr u64 bytes = 0;
 
-TEST(Memory, AllocateSizeReturnsValidPointer) {
-    for (u64 size = 1; size <= 1024; size *= 2) {
-        void* ptr = allocate_size(size);
-        ASSERT_NE(ptr, nullptr);
-        deallocate(ptr);
+        WHEN("allocating them") {
+            Result<void*, AllocError> result = try_allocate_size(bytes);
+
+            THEN("allocation is successful") {
+                REQUIRE(result.ok);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result.unwrap() != nullptr);
+            }
+
+            deallocate(result.unwrap());
+        }
+    }
+
+    GIVEN("1 byte") {
+        constexpr u64 bytes = 1;
+
+        WHEN("allocating it") {
+            Result<void*, AllocError> result = try_allocate_size(bytes);
+
+            THEN("allocation is successful") {
+                REQUIRE(result.ok);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result.unwrap() != nullptr);
+            }
+            
+            deallocate(result.unwrap());
+        }
+    }
+
+    GIVEN("an arbitrary number of bytes") {
+        u64 bytes = GENERATE(Catch::Generators::take(100, Catch::Generators::random(1, 2048)));
+
+
+        WHEN("allocating it") {
+            Result<void*, AllocError> result = try_allocate_size(bytes);
+
+            THEN("allocation is successful") {
+                REQUIRE(result.ok);
+            }
+            
+            THEN("the returned pointer is not null") {
+                REQUIRE(result.unwrap() != nullptr);
+            }
+            
+            deallocate(result.unwrap());
+        }
+    }
+
+    GIVEN("too much bytes to allocate (u64 max)") {
+        constexpr u64 bytes = std::numeric_limits<u64>::max();
+
+        WHEN("allocating it") {
+            Result<void*, AllocError> result = try_allocate_size(bytes);
+
+            THEN("allocation is not successful") {
+                REQUIRE(!result.ok);
+            }
+        }
     }
 }
 
-TEST(Memory, TryAllocateSizeSucceedsForSmallSizes) {
-    for (u64 size = 1; size <= 1024; size *= 2) {
-        auto result = try_allocate_size(size);
-        ASSERT_TRUE(result.ok);
-        ASSERT_NE(result.unwrap(), nullptr);
-        deallocate(result.unwrap());
+SCENARIO("allocating an arbitrary number of bytes works correctly", "[allocate_size]") {
+    GIVEN("0 bytes") {
+        constexpr u64 bytes = 0;
+
+        WHEN("allocating them") {
+            bool success = true;
+            void* result = nullptr;
+            try {
+                result = allocate_size(bytes);
+            } catch(AllocError& e) {
+                success = false;
+            }
+
+            THEN("allocation is successful") {
+                REQUIRE(success);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result != nullptr);
+            }
+
+            deallocate(result);
+        }
+    }
+
+    GIVEN("1 byte") {
+        constexpr u64 bytes = 1;
+
+        WHEN("allocating it") {
+            bool success = true;
+            void* result = nullptr;
+            try {
+                result = allocate_size(bytes);
+            } catch(AllocError& e) {
+                success = false;
+            }
+
+            THEN("allocation is successful") {
+                REQUIRE(success);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result != nullptr);
+            }
+            
+            deallocate(result);
+        }
+    }
+
+    GIVEN("an arbitrary number of bytes") {
+        u64 bytes = GENERATE(Catch::Generators::take(100, Catch::Generators::random(1, 2048)));
+
+
+        WHEN("allocating it") {
+            bool success = true;
+            void* result = nullptr;
+            try {
+                result = allocate_size(bytes);
+            } catch(AllocError& e) {
+                success = false;
+            }
+
+            THEN("allocation is successful") {
+                REQUIRE(success);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result != nullptr);
+            }
+            
+            deallocate(result);
+        }
+    }
+
+    GIVEN("too much bytes to allocate (u64 max)") {
+        constexpr u64 bytes = std::numeric_limits<u64>::max();
+
+        WHEN("allocating it") {
+            bool success = true;
+            try {
+                allocate_size(bytes);
+            } catch(AllocError& e) {
+                success = false;
+            }
+
+            THEN("allocation is not successful") {
+                REQUIRE(!success);
+            }
+        }
     }
 }
 
-//
-// typed allocation
-//
+SCENARIO("allocating a structure or a type works correctly", "[try_allocate]") {
+    GIVEN("an integer") {
+        constexpr u32 integer = 10;
 
-struct TestStruct {
-    u32 a;
-    u32 b;
-};
+        WHEN("allocating space for it and copying it into the memory") {
+            Result<u32*, AllocError> result = try_allocate(integer);
 
-TEST(Memory, AllocateCopiesValue) {
-    TestStruct original{42, 77};
+            THEN("allocation is successful") {
+                REQUIRE(result.ok);
+            }
 
-    TestStruct* ptr = allocate(original);
+            THEN("the returned pointer is not null") {
+                REQUIRE(result.unwrap() != nullptr);
+            }
 
-    ASSERT_NE(ptr, nullptr);
-    EXPECT_EQ(ptr->a, 42u);
-    EXPECT_EQ(ptr->b, 77u);
+            THEN("the memory at the pointer holds the same value as the integer") {
+                REQUIRE(*result.unwrap() == integer);
+            }
+            
+            deallocate(result.unwrap());
+        }
+    }
 
-    deallocate(ptr);
-}
+    GIVEN("an empty structure foo") {
+        struct Foo {} foo;
 
-TEST(Memory, TryAllocateCopiesValue) {
-    for (u32 i = 0; i < 128; ++i) {
-        TestStruct original{i, i * 3};
+        WHEN("allocating space for it and copying it into the memory") {
+            Result<Foo*, AllocError> result = try_allocate(foo);
 
-        auto result = try_allocate(original);
-        ASSERT_TRUE(result.ok);
+            THEN("allocation is successful") {
+                REQUIRE(result.ok);
+            }
 
-        TestStruct* ptr = result.unwrap();
-        EXPECT_EQ(ptr->a, i);
-        EXPECT_EQ(ptr->b, i * 3);
-
-        deallocate(ptr);
+            THEN("the returned pointer is not null") {
+                REQUIRE(result.unwrap() != nullptr);
+            }
+            
+            deallocate(result.unwrap());
+        }
     }
 }
 
-//
-// reallocation
-//
+SCENARIO("allocation of a structure or a type works correctly", "[allocate]") {
+    GIVEN("an integer") {
+        constexpr u32 integer = 10;
 
-TEST(Memory, ReallocatePreservesData) {
-    const u64 initial_size = 64;
-    const u64 new_size = 256;
+        WHEN("allocating space for it and copying it into the memory") {
+            u32* result = allocate(integer);
 
-    u8* ptr = static_cast<u8*>(allocate_size(initial_size));
-    ASSERT_NE(ptr, nullptr);
 
-    for (u64 i = 0; i < initial_size; ++i)
-        ptr[i] = static_cast<u8>(i);
+            THEN("the returned pointer is not null") {
+                REQUIRE(result != nullptr);
+            }
 
-    ptr = static_cast<u8*>(reallocate(ptr, new_size));
-    ASSERT_NE(ptr, nullptr);
-
-    for (u64 i = 0; i < initial_size; ++i)
-        EXPECT_EQ(ptr[i], static_cast<u8>(i));
-
-    deallocate(ptr);
-}
-
-TEST(Memory, TryReallocatePreservesData) {
-    const u64 initial_size = 128;
-    const u64 new_size = 512;
-
-    u8* ptr = static_cast<u8*>(allocate_size(initial_size));
-
-    for (u64 i = 0; i < initial_size; ++i)
-        ptr[i] = static_cast<u8>(i + 1);
-
-    auto result = try_reallocate(ptr, new_size);
-    ASSERT_TRUE(result.ok);
-
-    ptr = static_cast<u8*>(result.unwrap());
-
-    for (u64 i = 0; i < initial_size; ++i)
-        EXPECT_EQ(ptr[i], static_cast<u8>(i + 1));
-
-    deallocate(ptr);
-}
-
-//
-// mem_copy
-//
-
-TEST(Memory, MemCopyCopiesExactData) {
-    constexpr u64 size = 256;
-
-    u8* src  = static_cast<u8*>(allocate_size(size));
-    u8* dest = static_cast<u8*>(allocate_size(size));
-
-    for (u64 i = 0; i < size; ++i)
-        src[i] = static_cast<u8>(i);
-
-    mem_copy(dest, src, size);
-
-    for (u64 i = 0; i < size; ++i)
-        EXPECT_EQ(dest[i], src[i]);
-
-    deallocate(src);
-    deallocate(dest);
-}
-
-//
-// mem_move
-//
-
-TEST(Memory, MemMoveHandlesOverlapForward) {
-    constexpr u64 size = 128;
-
-    u8* buffer = static_cast<u8*>(allocate_size(size));
-
-    for (u64 i = 0; i < size; ++i)
-        buffer[i] = static_cast<u8>(i);
-
-    mem_move(buffer + 10, buffer, size - 10);
-
-    for (u64 i = 0; i < size - 10; ++i)
-        EXPECT_EQ(buffer[i + 10], static_cast<u8>(i));
-
-    deallocate(buffer);
-}
-
-TEST(Memory, MemMoveHandlesOverlapBackward) {
-    constexpr u64 size = 128;
-
-    u8* buffer = static_cast<u8*>(allocate_size(size));
-
-    for (u64 i = 0; i < size; ++i)
-        buffer[i] = static_cast<u8>(i);
-
-    mem_move(buffer, buffer + 10, size - 10);
-
-    for (u64 i = 0; i < size - 10; ++i)
-        EXPECT_EQ(buffer[i], static_cast<u8>(i + 10));
-
-    deallocate(buffer);
-}
-
-//
-// mem_set
-//
-
-TEST(Memory, MemSetFillsMemory) {
-    constexpr u64 size = 256;
-
-    u8* buffer = static_cast<u8*>(allocate_size(size));
-
-    for (u8 value = 0; value < 10; ++value) {
-        mem_set(buffer, value, size);
-
-        for (u64 i = 0; i < size; ++i)
-            EXPECT_EQ(buffer[i], value);
+            THEN("the memory at the pointer holds the same value as the integer") {
+                REQUIRE(*result == integer);
+            }
+            
+            deallocate(result);
+        }
     }
 
-    deallocate(buffer);
+    GIVEN("an empty structure foo") {
+        struct Foo {} foo;
+
+        WHEN("allocating space for it and copying it into the memory") {
+            Foo* result = allocate(foo);
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(result != nullptr);
+            }
+            
+            deallocate(result);
+        }
+    }
 }
 
-//
-// mem_equals
-//
+SCENARIO("trying to reallocate an arbitrary number of bytes works correctly", "[try_reallocate]") {
+    GIVEN("a previously allocated memory block with some data") {
+        u64 bytes = GENERATE(Catch::Generators::take(100, Catch::Generators::random(1, 1024)));
+        void* ptr = allocate_size(bytes);
+        mem_set(ptr, 0xAB, bytes);
+        
+        void* ptr_save = allocate_size(bytes);
+        mem_copy(ptr_save, ptr, bytes);
 
-TEST(Memory, MemEqualsReturnsTrueForEqualBuffers) {
-    constexpr u64 size = 256;
+        WHEN("reallocating it to 0 bytes") {
+            Result<void*, AllocError> r_new_ptr = try_reallocate(ptr, 0);
+            
+            THEN("the allocation is successful") {
+                REQUIRE(r_new_ptr.ok);
+            }
 
-    u8* a = static_cast<u8*>(allocate_size(size));
-    u8* b = static_cast<u8*>(allocate_size(size));
+            THEN("the returned pointer is not null") {
+                REQUIRE(r_new_ptr.unwrap() != nullptr);
+            }
 
-    for (u64 i = 0; i < size; ++i) {
-        a[i] = static_cast<u8>(i);
-        b[i] = static_cast<u8>(i);
+            deallocate(r_new_ptr.unwrap());
+        }
+
+        WHEN("reallocating it to 1 byte") {
+            Result<void*, AllocError> r_new_ptr = try_reallocate(ptr, 1);
+            
+            THEN("the alloction is successful") {
+                REQUIRE(r_new_ptr.ok); 
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(r_new_ptr.unwrap() != nullptr);
+            }
+
+            THEN("the contents are preserved") {
+                REQUIRE(mem_equals(ptr_save, r_new_ptr.unwrap(), 1));
+            }
+            
+            deallocate(r_new_ptr.unwrap());
+        }
+
+        WHEN("reallocating it to a larger arbitrary size") {
+            u64 new_size = GENERATE(Catch::Generators::take(50, Catch::Generators::random(1024, 2048)));
+            Result<void*, AllocError> r_new_ptr = try_reallocate(ptr, new_size);
+            
+            THEN("the allocation is successful") {
+                REQUIRE(r_new_ptr.ok);
+            }
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(r_new_ptr.unwrap() != nullptr);
+            }
+
+            THEN("the contents are preserved") {
+                REQUIRE(mem_equals(ptr_save, r_new_ptr.unwrap(), bytes));
+            }
+
+            deallocate(r_new_ptr.unwrap());
+        }
+
+        WHEN("reallocating it to an extremely large size") {
+            Result<void*, AllocError> r_new_ptr = try_reallocate(ptr, std::numeric_limits<u64>::max());
+            
+            THEN("the allocation is not successful") {
+                REQUIRE(!r_new_ptr.ok);
+            }
+
+            deallocate(ptr);
+        }
+
+        deallocate(ptr_save);
     }
-
-    EXPECT_TRUE(mem_equals(a, b, size));
-
-    deallocate(a);
-    deallocate(b);
 }
 
-TEST(Memory, MemEqualsDetectsDifference) {
-    constexpr u64 size = 256;
+SCENARIO("reallocation of an arbitrary number of bytes works correctly", "[reallocate]") {
+    GIVEN("a previously allocated memory block with some data") {
+        u64 bytes = GENERATE(Catch::Generators::take(100, Catch::Generators::random(1, 1024)));
+        void* ptr = allocate_size(bytes);
+        mem_set(ptr, 0xAB, bytes);
+        
+        void* ptr_save = allocate_size(bytes);
+        mem_copy(ptr_save, ptr, bytes);
 
-    u8* a = static_cast<u8*>(allocate_size(size));
-    u8* b = static_cast<u8*>(allocate_size(size));
+        WHEN("reallocating it to 0 bytes") {
+            void* new_ptr = reallocate(ptr, 0);
+            
+            THEN("the returned pointer is not null") {
+                REQUIRE(new_ptr != nullptr);
+            }
 
-    for (u64 i = 0; i < size; ++i) {
-        a[i] = static_cast<u8>(i);
-        b[i] = static_cast<u8>(i);
+            deallocate(new_ptr);
+        }
+
+        WHEN("reallocating it to 1 byte") {
+            void* new_ptr = reallocate(ptr, 1);
+
+            THEN("the returned pointer is not null") {
+                REQUIRE(new_ptr != nullptr);
+            }
+
+            THEN("the contents are preserved") {
+                REQUIRE(mem_equals(ptr, new_ptr, 1));
+            }
+            
+            deallocate(new_ptr);
+        }
+
+        WHEN("reallocating it to a larger arbitrary size") {
+            u64 new_size = GENERATE(Catch::Generators::take(50, Catch::Generators::random(1024, 2048)));
+            void* new_ptr = reallocate(ptr, new_size);
+            
+            THEN("the returned pointer is not null") {
+                REQUIRE(new_ptr != nullptr);
+            }
+
+            THEN("the contents are preserved") {
+                REQUIRE(mem_equals(ptr_save, new_ptr, bytes));
+            }
+
+            deallocate(new_ptr);
+        }
+
+        WHEN("reallocating it to an extremely large size") {
+            REQUIRE_THROWS_AS(reallocate(ptr, std::numeric_limits<u64>::max()), AllocError);
+            
+            deallocate(ptr);
+        }
+
+        deallocate(ptr_save);
     }
+}
 
-    for (u64 i = 0; i < size; ++i) {
-        b[i] ^= 0xFF;
-        EXPECT_FALSE(mem_equals(a, b, size));
-        b[i] ^= 0xFF;
+SCENARIO("deallocate frees memory safely", "[deallocate]") {
+    GIVEN("a previously allocated block") {
+        u64 bytes = GENERATE(Catch::Generators::take(100, Catch::Generators::random(1, 1024)));
+        void* ptr = allocate_size(bytes);
+
+        WHEN("deallocating it") {
+            THEN("it does not throw") {
+                REQUIRE_NOTHROW(deallocate(ptr));
+            }
+        }
     }
+}
 
-    deallocate(a);
-    deallocate(b);
+SCENARIO("deallocate panics when deallocating nullptr", "[deallocate]") {
+    GIVEN("a null pointer") {
+        WHEN("deallocating it") {
+            THEN("it panics") {
+                REQUIRE(code_aborts([] () {deallocate(nullptr);}));
+            }
+        }
+    }
 }
 

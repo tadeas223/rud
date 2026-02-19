@@ -11,13 +11,13 @@ namespace rud {
     [[noreturn]] void panic(const StringView msg) {
         StdErr err = StdErr::make();
         err.write_str(msg).try_or([](){
-            exit(1);
+            abort();
         });
         err.write_str(Lit("program panicked\n%s\n")).try_or([](){
-            exit(1);
+            abort();
         });
 
-        exit(1); 
+        abort(); 
     }
 }
 

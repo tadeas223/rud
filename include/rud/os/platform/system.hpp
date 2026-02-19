@@ -6,6 +6,7 @@
 
 namespace rud::os {
     [[noreturn]] void exit(u32 status_code);
+    [[noreturn]] void abort();
     void run_process(StringView msg, ds::LinearView<StringView> args);
 }
 

@@ -44,6 +44,8 @@ namespace rud {
     void mem_move(void* dest, const void* src, u64 size);
     void mem_set(void* dest, u8 value, u64 size);
     bool mem_equals(const void* ptr1, const void* ptr2, u64 size);
+
+    u64 mem_align_forward(u64 value, u64 align);
 }
 
 #endif

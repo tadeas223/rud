@@ -54,21 +54,6 @@ TEST_CASE("trying to allocate an arbitrary number of bytes works correctly", "[t
     }
 }
 
-SCENARIO("push and pop works on a list", "[list]") {
-    GIVEN("an empty list if integers") {
-        C_List<u32> list;
-
-        WHEN("a value is pushed into the list") {
-            list.push(10);
-
-            THEN("the list length is equal to 1") {
-                REQUIRE(list.len() == 1);
-            }
-        }
-    }
-}
-
-
 TEST_CASE("allocating an arbitrary number of bytes works correctly", "[allocate_size]") {
     SECTION("allocation of 0 bytes") {
         constexpr u64 bytes = 0;

@@ -1,13 +1,15 @@
+#include "rud/base/memory.hpp"
 #include "rud/ds/c_dlist.hpp"
+#include <limits>
 
 using namespace rud::ds;
 using namespace rud;
 
 int main (int argc, char *argv[]) {
-    C_DList<u32> list = C_DList<u32>::make();
+        void* a = allocate_size(std::numeric_limits<u64>::max());
 
-    list.push_front(1);
+        deallocate(a);
 
-    list.destroy();
+
     return 0;
 }

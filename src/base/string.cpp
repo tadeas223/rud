@@ -6,6 +6,7 @@ namespace rud {
     C_StringAlloc C_StringAlloc::make_copy_cstr(const ascii* cstr){
         u32 len = cstr_len(cstr);
         ascii* new_chars = static_cast<ascii*>(allocate_size(len));
+        
 
         mem_copy(new_chars, cstr, len);
 

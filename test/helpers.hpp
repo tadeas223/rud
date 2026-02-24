@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-inline bool code_aborts(void (*func)()) {
+inline bool code_aborts(void* ctx, void (*func)(void* ctx)) {
     pid_t pid = fork();
     if (pid < 0) {
         return false;
@@ -19,7 +19,7 @@ inline bool code_aborts(void (*func)()) {
             fclose(devnull);
         }
 
-        func();      // Run the code that might abort
+        func(ctx);      // Run the code that might abort
         _exit(0);    // Exit normally if no abort occurred
     } else {
         // Parent process

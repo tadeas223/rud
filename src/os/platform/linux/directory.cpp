@@ -126,7 +126,7 @@ namespace rud::os {
     
     Result<void, IOError> C_Directory::set_current_directory(StringView path) {
         Result<C_Directory, IOError> r_dir = C_Directory::make(path);
-        if(!r_dir.ok) {
+        if(!r_dir.is_ok()) {
             return Result<void, IOError>::make_error(r_dir.unwrap_error());
         }
         C_Directory dir = r_dir.unwrap();

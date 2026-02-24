@@ -33,13 +33,13 @@ namespace rud::ds {
 // }}}
         
         inline void set(u32 index, T value) {
-            Assert(index < N, Lit("index is outside of an array"));
+            Pre(index < N);
 
             p_data[index] = value;
         }
         
         inline T* get(u32 index) {
-            Assert(index < N, Lit("index is outside of an array"));
+            Pre(index < N);
 
             return &p_data[index];
         }

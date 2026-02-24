@@ -4,89 +4,137 @@
 #include "rud/base/compile_settings.hpp"
 #include "rud/base/system.hpp"
 #include "rud/base/string.hpp"
+#include "rud/base/types.hpp"
 
 namespace rud {
     template<typename V, typename E>
     struct [[nodiscard]] Result {
         union {
-            V value;
-            E error;
+            V p_value;
+            E p_error;
         };
 
-        bool ok;
+        bool p_is_ok;
+        
+// {{{ get_set
+        inline bool is_ok() {
+            return p_is_ok;
+        }
+        
+        inline bool is_error() {
+            return !p_is_ok;
+        }
+// }}}
 
+// {{{ make_destroy
         inline static Result<V, E> make_ok(V value) {
-            return {.value = value, .ok = true};
+            return {.p_value = value, .p_is_ok = true};
         }
         
         inline static Result<V, E> make_error(E error) {
-            return {.error = error, .ok = false};
-        }
-       
-        template<typename Lambda>
-        inline V try_or(Lambda l) {
-            if(!ok) return l();
-            return value;
+            return {.p_error = error, .p_is_ok = false};
         }
 
-        inline V except(StringView msg) {
-            if(!ok) panic(msg);
-            return value;
+        inline void destroy_contents(callback_destroy<V> destroy_func) {
+            if(is_ok()) {
+                destroy_func(p_value);
+            }
+        }
+
+        inline void destroy_error(callback_destroy<E> destroy_func) {
+            if(is_error()) {
+                destroy_func(p_error);
+            }
+        }
+// }}}
+       
+        inline V or_expect(StringView msg) {
+            if(is_error()) panic_raw(msg);
+            return p_value;
+        }
+    
+        template<typename F>
+        inline V or_try(F func) {
+            if(is_ok()) {
+                return p_value;
+            } else {
+                return func();
+            }
         }
 
         inline V or_panic() {
-            if(!ok) panic(Lit("unhandled error occured"));
-            return value;
+            if(is_error()) panic(Lit("unhandled error occured"));
+            return p_value;
         }
  
         V unwrap() {
-            Assert(ok == true, Lit("Result::value() called, but result contained an error"));
+            Pre(is_ok());
 
-            return value;
+            return p_value;
         }
 
         E unwrap_error() {
-            Assert(ok == false, Lit("Result::error() called, but result contained a value"));
+            Pre(is_error());
 
-            return error;
+            return p_error;
         }
     };
     
     
     template<typename E>
     struct [[nodiscard]] Result<void, E> {
-        E error;
-        bool ok;
-        
+        E p_error;
+        bool p_is_ok;
+       
+// {{{ get_set
+        inline bool is_ok() {
+            return p_is_ok;
+        }
+
+        inline bool is_error() {
+            return !p_is_ok;
+        }
+// }}}
+
+// {{{ make_destroy
         inline static Result<void, E> make_ok() {
-            return {.ok = true};
+            return {.p_is_ok = true};
         }
         
         inline static Result<void, E> make_error(E error) {
-            return {.error = error, .ok = false};
+            return {.p_error = error, .p_is_ok = false};
         }
 
-        inline void except(StringView msg) {
-            if(!ok) panic(msg);
+        inline void destroy_error(callback_destroy<E> destroy_func) {
+            if(is_error()) {
+                destroy_func(p_error);
+            }
+        }
+// }}}
+
+        inline void or_expect(StringView msg) {
+            if(is_error()) panic_raw(msg);
         }
         
-        template<typename Lambda>
-        inline void try_or(Lambda l) {
-            if(!ok) l();
+        template<typename F>
+        inline void or_try(F func) {
+            if(is_error()) {
+                return func();
+            }
         }
-
+        
         inline void or_panic() {
-            if(!ok) panic(Lit("unhandled error occured"));
+            if(is_error()) panic(Lit("unhandled error occured"));
         }
 
         void unwrap() {
-            Assert(ok == true, Lit("Result::value() called, but result contained an error"));
+            Pre(is_ok());
         }
 
         E unwrap_error() {
-            Assert(ok == false, Lit("Result::error() called, but result contained a value"));
+            Pre(is_error());
 
-            return error;
+            return p_error;
         }
     };
 }

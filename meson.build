@@ -3,6 +3,7 @@ project('rud', 'cpp', default_options: ['cpp_std=c++20'])
 add_project_arguments([
   '-O0',
   # '-march=native'
+  '-Wno-class-memaccess'
 ],language: 'cpp')
 
 sources = []

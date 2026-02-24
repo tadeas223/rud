@@ -10,10 +10,20 @@ using namespace rud::os;
 namespace rud {
     [[noreturn]] void panic(const StringView msg) {
         StdErr err = StdErr::make();
-        err.write_str(msg).try_or([](){
+        err.write_str(msg).or_try([](){
             abort();
         });
-        err.write_str(Lit("program panicked\n%s\n")).try_or([](){
+
+        err.write_str(Lit("program panicked\n%s\n")).or_try([](){
+            abort();
+        });
+
+        abort(); 
+    }
+    
+    [[noreturn]] void panic_raw(const StringView msg) {
+        StdErr err = StdErr::make();
+        err.write_str(msg).or_try([](){
             abort();
         });
 

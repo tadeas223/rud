@@ -76,13 +76,14 @@ namespace rud::ds {
         }
 
         inline T pop() {
-            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
+            Pre(len() != 0);
+            
             p_len--;
             return p_data[p_len];
         }
 
         inline T pop_front() {
-            Assert(p_len != 0, Lit("cannot pop from an empty vector"));
+            Pre(len() != 0);
             
             T value = p_data[0];
             p_len--;
@@ -91,13 +92,13 @@ namespace rud::ds {
         }
 
         inline void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index outside of a vector"));
+            Pre(index < p_len);
 
             p_data[index] = value;
         }
 
         inline T remove(u32 index) {
-            Assert(index < p_len, Lit("index outside of a vector"));
+            Pre(index < p_len);
             
             if(index == 0) {
                 return pop_front();

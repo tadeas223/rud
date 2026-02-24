@@ -18,7 +18,7 @@ namespace rud {
     template<typename T>
     inline Result<T*, AllocError> try_allocate(T original) {
         Result<void*, AllocError> r_ptr = try_allocate_size(sizeof(T));
-        if(r_ptr.ok) {
+        if(r_ptr.is_ok()) {
             T* ptr = static_cast<T*>(r_ptr.unwrap());
             *ptr = original;
             return Result<T*, AllocError>::make_ok(ptr);

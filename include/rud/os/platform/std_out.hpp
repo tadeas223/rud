@@ -17,7 +17,7 @@ namespace rud::os {
     inline void debug_print(StringView str) {
         StdOut out = StdOut::make();
         out.write_str(str)
-            .except(Lit("failed to write to standard out"));
+            .or_expect(Lit("failed to write to standard out"));
     }
 }
 

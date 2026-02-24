@@ -1,12 +1,9 @@
 #include "rud/base/memory.hpp"
 
 #include "rud/base/result.hpp"
-#include "rud/base/macros.hpp"
 #include "rud/base/env.hpp"
 #include "rud/base/system.hpp"
 #include "rud/os/platform/memory.hpp"
-#include <cstdlib>
-#include <cstring>
 #include <limits>
 
 using namespace rud::os;
@@ -31,7 +28,9 @@ namespace rud {
     }
 
     void mem_set(void* dest, u8 value, u64 size) {
-        memset(dest, value, size);
+        while(size--) {
+            reinterpret_cast<u8*>(dest)[size] = value;
+        }
     }
 
     bool mem_equals(const void* ptr1, const void* ptr2, u64 size) {
@@ -45,6 +44,7 @@ namespace rud {
     
     u64 mem_align_forward(u64 value, u64 align) {
         u64 mod = value % align;
+        
         if(mod == 0) {
             return value;
         }
@@ -78,14 +78,14 @@ namespace rud {
     static Result<Allocator, OsAllocError> allocator_make() {
         u64 reserve_size = mem_page() * RESERVE;
         Result<void*, OsAllocError> r_reserve = mem_reserve(reserve_size);
-        if(!r_reserve.ok) {
+        if(!r_reserve.is_ok()) {
             return Result<Allocator, OsAllocError>::make_error(r_reserve.unwrap_error()); 
         }
         void* reserve = r_reserve.unwrap();
         
         u64 commit_size =  mem_page() * COMMIT;
         Result<void, OsAllocError> r_commit = mem_commit(reserve, commit_size);
-        if(!r_commit.ok) {
+        if(!r_commit.is_ok()) {
             return Result<Allocator, OsAllocError>::make_error(r_commit.unwrap_error()); 
         }
         
@@ -118,7 +118,7 @@ namespace rud {
     static Result<void, OsAllocError> allocator_commit(Allocator* allocator) {
         u64 commit_size =  mem_page() * COMMIT;
         Result<void, OsAllocError> r_commit = mem_commit(allocator->reserve + allocator->commit_pos, commit_size);
-        if(!r_commit.ok) {
+        if(!r_commit.is_ok()) {
             return Result<void, OsAllocError>::make_error(r_commit.unwrap_error()); 
         }
 
@@ -141,7 +141,7 @@ namespace rud {
     Result<void*, AllocError> try_allocate_size(u64 size) {
         if(allocator.reserve == nullptr) {
             Result<Allocator, OsAllocError> r_allocator = allocator_make();
-            if(!r_allocator.ok) {
+            if(!r_allocator.is_ok()) {
                 return Result<void*, AllocError>::make_error(AllocError::OutOfMemory);
             }
 
@@ -209,7 +209,7 @@ namespace rud {
         }
 
         Result<void, OsAllocError> r_commit = allocator_commit(&allocator); 
-        if(!r_commit.ok) {
+        if(!r_commit.is_ok()) {
             return Result<void*, AllocError>::make_error(AllocError::OutOfMemory);
         }
 
@@ -224,7 +224,7 @@ namespace rud {
         AllocNode* node = reinterpret_cast<AllocNode*>(reinterpret_cast<u8*>(ptr) - NODE_ALIGN);
         
         Result<void*, AllocError> r_alloc = try_allocate_size(new_size);
-        if(!r_alloc.ok) {
+        if(!r_alloc.is_ok()) {
             return r_alloc;
         }
         void* new_ptr = r_alloc.unwrap();
@@ -242,6 +242,7 @@ namespace rud {
 
     void deallocate(void* ptr) {
         Assert(allocator.reserve != nullptr, Lit("deallocate() -> allocate was never called"));
+        
         if(ptr == nullptr) {
             panic(Lit("deallocating a null pointer"));
         }
@@ -299,7 +300,7 @@ namespace rud {
     
     void* allocate_size(u64 size) {
         Result<void*, AllocError> ptr = try_allocate_size(size);
-        if(!ptr.ok) {
+        if(!ptr.is_ok()) {
             #ifdef EXCEPTIONS_ENABLED
             throw AllocError::OutOfMemory;
             #else
@@ -312,7 +313,7 @@ namespace rud {
     
     void* reallocate(void* ptr, u64 new_size) {
         Result<void*, AllocError> new_ptr = try_reallocate(ptr, new_size);
-        if(!new_ptr.ok) {
+        if(!new_ptr.is_ok()) {
             #ifdef EXCEPTIONS_ENABLED
             throw AllocError::OutOfMemory;
             #else

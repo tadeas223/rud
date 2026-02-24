@@ -69,7 +69,7 @@ namespace rud::ds {
         }
 
         T pop() {
-            Assert(p_tail != nullptr, Lit("cannot pop from an empty list"));
+            Pre(p_tail != nullptr);
             
             T value = p_tail->value;
             
@@ -96,7 +96,7 @@ namespace rud::ds {
         }
 
         T pop_front() {
-            Assert(p_head != nullptr, Lit("cannot pop from an empty list"));
+            Pre(p_head != nullptr);
 
             T value = p_head->value;
             if(p_len == 1) {
@@ -120,7 +120,7 @@ namespace rud::ds {
             if(index == 0) {
                 return pop_front();
             }
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Pre(index < p_len);
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index-1; i++) {
@@ -152,7 +152,7 @@ namespace rud::ds {
         }
 
         void set(u32 index, T value) {
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Pre(index < p_len);
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index; i++) {
@@ -163,19 +163,19 @@ namespace rud::ds {
         }
 
         inline T* peek() {
-            Assert(p_tail != nullptr, Lit("cannot peek into an empty list"));
+            Pre(p_tail != nullptr);
 
             return &p_tail->value;
         }
 
         inline T* peek_front() {
-            Assert(p_head != nullptr, Lit("cannot peek into an empty list"));
+            Pre(p_head != nullptr);
 
             return &p_head->value;
         }
 
         T* get(u32 index) {
-            Assert(index < p_len, Lit("index is outside of the list"));
+            Pre(index < p_len);
 
             Node<T>* iter_node = p_head;
             for(u32 i = 0; i < index; i++) {

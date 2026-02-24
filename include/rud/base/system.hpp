@@ -5,6 +5,7 @@
 
 namespace rud {
     [[noreturn]] void panic(StringView msg);
+    [[noreturn]] void panic_raw(const StringView msg);
 }
 
 #endif

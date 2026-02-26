@@ -53,7 +53,7 @@ namespace rud {
     }
    
 #define COMMIT 4
-#define RESERVE 1024
+#define RESERVE 4'000'000 // ~ 4GB on linux
 #define ALIGN sizeof(void*)
 #define NODE_ALIGN mem_align_forward(sizeof(AllocNode), ALIGN)
 

@@ -9,9 +9,8 @@
 #define Stringify2(x) #x
 #define LineString Stringify(__LINE__)
 
-#define TempFuncDecl(T)\
-    inline const T* temp() {\
-        return this;\
-    }\
+#define Kilobytes(x) x * 1024
+#define Megabytes(x) x * 1024 * 1024
+#define Gigabytes(x) x * 1024 * 1024 * 1024
 
 #endif

@@ -5,26 +5,25 @@
 namespace rud::ds {
     template<typename T>
     struct LinearView {
-        const T* (*get_func)(void* ctx, u32 index);
-        void (*set_func)(void* ctx, u32 index, T value);
-        u32 (*len_func)(void* ctx);
+        T* (*p_get_func)(void* ctx, u32 index);
+        u32 (*p_len_func)(void* ctx);
 
-        void* ctx;
+        void* p_ctx;
 
-        const T* get(u32 index) const {
-            return get_func(ctx, index);
+        inline static LinearView<T> make(void* ctx, u32 (*len_func)(void* ctx), T* (*get_func)(void*, u32)) {
+            return {get_func, len_func, ctx};
+        }
+
+        inline T* get(u32 index) const {
+            return p_get_func(p_ctx, index);
         }
         
-        void set(u32 index, T value) {
-            return get_func(ctx, index, value);
-        }
-        
-        u32 len() const {
-            return len_func(ctx);
+        inline u32 len() const {
+            return p_len_func(p_ctx);
         }
 
-        const T* operator[](u32 index) const {
-            return get_func(ctx, index);
+        inline T* operator[](u32 index) const {
+            return p_get_func(p_ctx, index);
         }
     };
 }

@@ -1,17 +1,33 @@
 #include "rud/base/system.hpp"
 
-#include "rud/os_low/system.hpp"
-#include "rud/os/std_out.hpp"
+#include "rud/os/platform/std_err.hpp"
+#include "rud/os/platform/system.hpp"
+#include "rud/os/platform/std_out.hpp"
 #include <unistd.h>
 
 using namespace rud::os;
 
 namespace rud {
     [[noreturn]] void panic(const StringView msg) {
-        debug_print(msg);
-        debug_print(Lit("program panicked\n%s\n"));
+        StdErr err = StdErr::make();
+        err.write_str(msg).or_try([](){
+            abort();
+        });
 
-        os_low::exit(1); 
+        err.write_str(Lit("program panicked\n%s\n")).or_try([](){
+            abort();
+        });
+
+        abort(); 
+    }
+    
+    [[noreturn]] void panic_raw(const StringView msg) {
+        StdErr err = StdErr::make();
+        err.write_str(msg).or_try([](){
+            abort();
+        });
+
+        abort(); 
     }
 }
 

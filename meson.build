@@ -1,7 +1,17 @@
 project('rud', 'cpp', default_options: ['cpp_std=c++20'])
 
+add_project_arguments([
+  '-O0',
+  # '-march=native'
+  '-Wno-class-memaccess'
+],language: 'cpp')
+
 sources = []
 incl_dirs = include_directories('include', 'src')
+
+cpu_family = host_machine.cpu_family()
+cpu = host_machine.cpu()
+system = host_machine.system()
 
 subdir('src')
 
@@ -17,5 +27,8 @@ rud_dep = declare_dependency(
 )
 
 meson.override_dependency('rud', rud_dep)
+
+subdir('test')
+# subdir('example')
 
 executable('main', 'src/main.cpp', dependencies: rud_dep)

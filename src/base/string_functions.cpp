@@ -12,8 +12,8 @@ namespace rud {
         return str;
     }
     
-    ds::C_Vector<StringView> string_split(StringView string, ascii sepparator) {
-        C_Vector<StringView> splits = C_Vector<StringView>::make();
+    ds::C_DArray<StringView> string_split(StringView string, ascii sepparator) {
+        C_DArray<StringView> splits = C_DArray<StringView>::make();
     
         u32 split_start = 0;
 

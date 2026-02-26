@@ -2,6 +2,7 @@
 #define RUD_DS_ARRAY_HPP
 
 #include "rud/base/compile_settings.hpp"
+#include "rud/base/destroyer.hpp"
 #include "rud/ds/linear_view.hpp"
 #include "rud/base/types.hpp"
 
@@ -24,10 +25,10 @@ namespace rud::ds {
         inline static Array<T, N> make() {
             return {};
         }
-
-        inline void destroy_contents(void (*destroy_func)(T value)) {
+    
+        inline void destroy_contents(Destroyer<T> destroyer) {
             for(u32 i = 0; i < N; ++i) {
-                destroy_func(p_data[i]);
+                destroyer.invoke(p_data[i]);
             }
         }
 // }}}

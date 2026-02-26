@@ -2,9 +2,9 @@
 #define RUD_BASE_OPTION_HPP
 
 #include "rud/base/compile_settings.hpp"
+#include "rud/base/destroyer.hpp"
 #include "rud/base/string.hpp"
 #include "rud/base/system.hpp"
-#include "rud/base/types.hpp"
 
 namespace rud {
     template<typename V>
@@ -31,9 +31,9 @@ namespace rud {
             return {.p_has_some = false};
         }
         
-        inline void destroy_contents(callback_destroy<V> callback) {
+        inline void destroy_contents(Destroyer<V> destroyer) {
             if(p_has_some) {
-                callback(p_value);
+                destroyer.invoke(p_value);
             }
         }
 // }}}

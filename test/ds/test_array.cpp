@@ -4,21 +4,13 @@
 using namespace rud;
 using namespace rud::ds;
 
-//
-// construction and  basic uses
-//
-
-TEST(Array, Construction) {
+TEST(Array, make) {
     auto array = Array<u32, 100>::make();
 
     EXPECT_EQ(array.len(), 100);
 }
 
-//
-// set_get
-//
-
-TEST(Array, SetGet) {
+TEST(Array, set_get) {
     auto array = Array<u32, 100>::make();
 
     for (u32 i = 0; i < array.len(); ++i)
@@ -30,7 +22,7 @@ TEST(Array, SetGet) {
     }
 }
 
-TEST(Array, OverwriteValues) {
+TEST(Array, overwrite_values) {
     auto array = Array<u32, 32>::make();
 
     for (u32 i = 0; i < array.len(); ++i)
@@ -43,16 +35,12 @@ TEST(Array, OverwriteValues) {
         EXPECT_EQ(*array[i], i + 100);
 }
 
-//
-// boundary checks
-//
-
-TEST(Array, GetOutOfBoundsAsserts) {
+TEST(Array, get_out_of_bounds) {
     auto array = Array<u32, 10>::make();
     EXPECT_DEATH(array.get(10), ".");
 }
 
-TEST(Array, SetOutOfBoundsAsserts) {
+TEST(Array, set_out_of_bounds) {
     auto array = Array<u32, 10>::make();
     EXPECT_DEATH(array.set(10, 1), ".");
 }
@@ -61,7 +49,7 @@ TEST(Array, SetOutOfBoundsAsserts) {
 // data() correctness
 //
 
-TEST(Array, DataPointerMatchesStorage) {
+TEST(Array, data_pointer_corectness) {
     auto array = Array<u32, 64>::make();
 
     for (u32 i = 0; i < array.len(); ++i)
@@ -73,7 +61,7 @@ TEST(Array, DataPointerMatchesStorage) {
         EXPECT_EQ(data[i], *array[i]);
 }
 
-TEST(Array, DataPointerIsStable) {
+TEST(Array, data_pointer_stability) {
     auto array = Array<u32, 16>::make();
 
     const u32* ptr = array.data();
@@ -82,12 +70,8 @@ TEST(Array, DataPointerIsStable) {
     EXPECT_EQ(ptr[5], 42);
 }
 
-//
-// destroy_contents behavior
-//
-
 static u32 counter = 0;
-TEST(Array, DestroyContentsVisitsAllElements) {
+TEST(Array, destroy_contents) {
     auto array = Array<u32, 50>::make();
 
 

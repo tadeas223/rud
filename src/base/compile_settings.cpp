@@ -11,6 +11,8 @@ namespace rud {
 
             err = StdErr::make();
             err.write_str(Lit("assertion failed\n")).or_panic();
+            err.write_str(expr).or_panic();
+            err.write_str(Lit("\n")).or_panic();
             err.write_str(msg).or_panic();
             err.write_str(Lit("\n")).or_panic();
             panic(Lit(""));

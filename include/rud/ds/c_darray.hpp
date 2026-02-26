@@ -44,9 +44,9 @@ namespace rud::ds {
             deallocate(p_data);
         }
        
-        inline void destroy(void (*destroy_func)(T value)) {
+        inline void destroy(Destroyer<T> destroyer) {
             for(u32 i = 0; i < p_len; ++i) {
-                destroy_func(p_data[i]);
+                destroyer.invoke(p_data[i]);
             }
 
             deallocate(p_data);

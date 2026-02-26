@@ -42,8 +42,23 @@ namespace {
     
     TEST(Option, destroy_contents) {
         Option<u32> option = Option<u32>::make_some(10);
-        option.destroy_contents([](u32 value) {
-            EXPECT_EQ(value, 10);
-        });
+
+        u32 counter = 0;
+        option.destroy_contents(Destroyer<u32>::make(&counter, [](void* ctx, u32 value) {
+            u32* counter = reinterpret_cast<u32*>(ctx);
+            *counter += 1;
+        }));
+
+        EXPECT_EQ(counter, 1);
+        
+        Option<u32> option_none = Option<u32>::make_none();
+
+        counter = 0;
+        option_none.destroy_contents(Destroyer<u32>::make(&counter, [](void* ctx, u32 value) {
+            u32* counter = reinterpret_cast<u32*>(ctx);
+            *counter += 1;
+        }));
+
+        EXPECT_EQ(counter, 0);
     }
 }

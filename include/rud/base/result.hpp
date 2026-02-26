@@ -2,6 +2,7 @@
 #define RUD_BASE_RESULT_HPP
 
 #include "rud/base/compile_settings.hpp"
+#include "rud/base/destroyer.hpp"
 #include "rud/base/system.hpp"
 #include "rud/base/string.hpp"
 #include "rud/base/types.hpp"
@@ -35,15 +36,15 @@ namespace rud {
             return {.p_error = error, .p_is_ok = false};
         }
 
-        inline void destroy_contents(callback_destroy<V> destroy_func) {
+        inline void destroy_contents(Destroyer<V> destroyer) {
             if(is_ok()) {
-                destroy_func(p_value);
+                destroyer.invoke(p_value);
             }
         }
 
-        inline void destroy_error(callback_destroy<E> destroy_func) {
+        inline void destroy_error(Destroyer<E> destroyer) {
             if(is_error()) {
-                destroy_func(p_error);
+                destroyer.invoke(p_error);
             }
         }
 // }}}
@@ -64,6 +65,13 @@ namespace rud {
 
         inline V or_panic() {
             if(is_error()) panic(Lit("unhandled error occured"));
+            return p_value;
+        }
+
+        inline V or_default(V value) {
+            if(is_error()) {
+                return value;
+            }
             return p_value;
         }
  
@@ -105,9 +113,9 @@ namespace rud {
             return {.p_error = error, .p_is_ok = false};
         }
 
-        inline void destroy_error(callback_destroy<E> destroy_func) {
+        inline void destroy_error(Destroyer<E> destroyer) {
             if(is_error()) {
-                destroy_func(p_error);
+                destroyer.invoke()(p_error);
             }
         }
 // }}}
